@@ -1,4 +1,4 @@
 MULTIWORDLE
 
 Authors:
-Benjamin Palay
+Benjamin Palay, Gia Croock
