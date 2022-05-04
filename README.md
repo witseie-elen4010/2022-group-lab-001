@@ -1,0 +1,4 @@
+MULTIWORDLE
+
+Authors:
+Benjamin Palay
