@@ -1,4 +1,4 @@
 MULTIWORDLE
 
 Authors:
-Benjamin Palay, Gia Croock, Ryan Selesnik, Rael Ware
+Benjamin Palay, Gia Croock, Ryan Selesnik, Rael Ware, Ilan Malkin
