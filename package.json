@@ -1,0 +1,25 @@
+{
+  "name": "2022-group-lab-001",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/witseie-elen4010/2022-group-lab-001.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/witseie-elen4010/2022-group-lab-001/issues"
+  },
+  "homepage": "https://github.com/witseie-elen4010/2022-group-lab-001#readme",
+  "dependencies": {
+    "express": "4.18.1"
+  },
+  "devDependencies": {
+    "jest": "^28.1.0"
+  }
+}
