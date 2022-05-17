@@ -1,0 +1,28 @@
+body {
+    background-color: black;
+}
+
+.title {
+    color: white;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    width: 500px;
+}
+
+.choose-mode {
+    color: white;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    width: 350px;
+}
+
+.Button {
+    background-color: #313f47;
+    box-shadow: 0 5px 0 #105cad;
+    color: whitesmoke;
+    margin-left: auto;
+    margin-right: auto;
+    width: 300px
+}
