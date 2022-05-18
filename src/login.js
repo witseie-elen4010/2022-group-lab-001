@@ -8,9 +8,12 @@ const validLogins = [
 function validate () {
   const username = document.getElementById('username').value
   const password = document.getElementById('password').value
+  let found = false
   validLogins.every(validLogin => {
-    if (username === validLogin.name && password === validLogin.password) {
+    if (username === validLogin.username && password === validLogin.password) {
+      found = true
       alert('login succesful')
+      console.log('login succesful')
       // break out of loop
       return false
     }
@@ -18,5 +21,12 @@ function validate () {
     return true
   })
   // no matching logins found
-  alert('Invalid username or password')
+  if (!found) {
+    alert('Invalid username or password')
+  }
 }
+
+// const submitButton = document.getElementById('submitbtn')
+// submitButton.addEventListener('click', function () {
+//   validate()
+// }, false)
