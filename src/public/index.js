@@ -1,14 +1,19 @@
 'use strict'
+
+const wordOfTheDay = 'train'
+const messageContainer = document.querySelector('.messageContainer')
+
 const checkCurrentRow = (
   rowsOfGuesses,
   currentRow,
   currentElement,
   wordOfTheDay
 ) => {
+  console.log(currentElement)
   if (currentElement === 5) {
-    const currentGuess = rowsOfGuesses[currentRow].join('')
+    const currentGuess = rowsOfGuesses[currentRow].join('').toLowerCase()
     if (currentGuess === wordOfTheDay) {
-      return 'correct';
+      messageContainer.textContent = 'Correct';
     }
   }
 }
@@ -34,7 +39,10 @@ function generateBoard () {
     rowElement.setAttribute('id', 'boardRow-' + boardRowIndex)
     boardRow.forEach((tile, tileIndex) => {
       const tileElement = document.createElement('div')
-      tileElement.setAttribute('id', 'boardRow-' + boardRowIndex + '-tile-' + tileIndex)
+      tileElement.setAttribute(
+        'id',
+        'boardRow-' + boardRowIndex + '-tile-' + tileIndex
+      )
       tileElement.classList.add('tile')
       rowElement.append(tileElement)
     })
@@ -52,7 +60,9 @@ function addLetter (letter) {
   const previousTile = currentTile
   // to ensure we only enter 5 letters in one row
   if (currentTile < 5 && currentRow < 6) {
-    const tile = document.getElementById('boardRow-' + currentRow + '-tile-' + currentTile)
+    const tile = document.getElementById(
+      'boardRow-' + currentRow + '-tile-' + currentTile
+    )
     tile.textContent = letter
     boardArray[currentRow][currentTile] = letter
     console.log('boardRow', boardArray)
@@ -107,9 +117,13 @@ const handleClick = (letter) => {
   if (letter !== 'Backspace' || letter !== 'Enter') {
     addLetter(letter)
   }
+  if (letter === 'Enter') {
+    console.log(letter)
+    checkCurrentRow(boardArray, currentRow, currentTile, wordOfTheDay)
+  }
 }
 function generateKeyboard () {
-  keys.forEach(key => {
+  keys.forEach((key) => {
     const buttonTag = document.createElement('button')
     buttonTag.textContent = key
     buttonTag.setAttribute('id', key)
