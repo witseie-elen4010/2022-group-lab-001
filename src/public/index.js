@@ -47,17 +47,12 @@ function addLetter (letter) {
 
     currentRow = position.previousRow
     currentTile = position.previousTile
-    console.log('position', position[1])
-    // currentTile++
   }
 }
-
 generateBoard()
-
 // letter input from keyboard, later should be updated to work with on screen keyboard-just used to visually check its working
 document.addEventListener('keypress', (event) => {
   const letter = event.key
   console.log('this is letter', letter)
   addLetter(letter)
 })
-module.exports = getCurrentPosition
