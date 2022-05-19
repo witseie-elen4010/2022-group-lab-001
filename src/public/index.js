@@ -91,15 +91,16 @@ const keys = [
 ]
 
 const handleClick = (letter) => {
-  addLetter(letter)
-  return letter
+  if (letter !== 'Backspace' || letter !== 'Enter') {
+    addLetter(letter)
+  }
 }
-
 function generateKeyboard () {
   keys.forEach(key => {
     const buttonTag = document.createElement('button')
     buttonTag.textContent = key
     buttonTag.setAttribute('id', key)
+    console.log(key)
     buttonTag.addEventListener('click', () => handleClick(key))
     keyboard.append(buttonTag)
   })
