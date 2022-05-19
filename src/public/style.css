@@ -39,15 +39,15 @@ body {
 
 
 .keyContainer{
-    width: 510px;
+    width: 515px;
     display: flex;
     flex-wrap: wrap;
 }
 
 .keyContainer button {
     width: 43px;
-    height: 58px;
-    border-radius: 4px;
+    height: 60px;
+    border-radius: 5px;
     border: none;
     background-color: #ffff17;
     margin: 4px;
@@ -59,6 +59,6 @@ body {
 
 .keyContainer button:nth-child(20),
 .keyContainer button:nth-child(28) {
-    width: 68px;
+    width: 70px;
 }
 
