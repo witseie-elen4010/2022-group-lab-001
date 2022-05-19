@@ -1,10 +1,14 @@
 'use strict'
 
 const path = require('path')
+
 const express = require('express')
 const router = express.Router()
 
 router.get('/', function (req, res) {
+  res.sendFile(path.join(__dirname, 'views', 'login.html'))
+})
+router.get('/index', function (req, res) {
   res.sendFile(path.join(__dirname, 'views', 'index.html'))
 })
 router.get('/singlePlayer', function (req, res) {
