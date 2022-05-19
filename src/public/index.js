@@ -49,6 +49,16 @@ function addLetter (letter) {
     currentTile = position.previousTile
   }
 }
+
+function removeLetter () {
+  if (currentTile > 0) {
+    currentTile--
+    const tile = document.getElementById('boardRow-' + currentRow + '-tile-' + currentTile)
+    tile.textContent = ''
+    boardArray[currentRow][currentTile] = ''
+  }
+}
+
 generateBoard()
 // letter input from keyboard, later should be updated to work with on screen keyboard-just used to visually check its working
 document.addEventListener('keypress', (event) => {
@@ -91,9 +101,11 @@ const keys = [
 ]
 
 const handleClick = (letter) => {
-  if (letter !== 'Backspace' || letter !== 'Enter') {
-    addLetter(letter)
+  if (letter === 'Backspace') {
+    removeLetter()
+    return
   }
+  addLetter(letter)
 }
 function generateKeyboard () {
   keys.forEach(key => {
