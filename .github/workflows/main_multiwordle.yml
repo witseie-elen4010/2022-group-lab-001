@@ -6,7 +6,7 @@ name: Build and deploy Node.js app to Azure Web App - Multiwordle
 on:
   push:
     branches:
-      - main
+      - staging
   workflow_dispatch:
 
 jobs:
