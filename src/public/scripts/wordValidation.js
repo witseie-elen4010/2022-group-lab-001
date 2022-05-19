@@ -1,15 +1,15 @@
 const checkCurrentRow = (
   rowsOfGuesses,
   currentRow,
-  currentTile,
+  currentElement,
   wordOfTheDay
 ) => {
-  if (currentTile === 5) {
-    const currentGuess = rowsOfGuesses[currentRow].join("");
+  if (currentElement === 5) {
+    const currentGuess = rowsOfGuesses[currentRow].join('')
     if (currentGuess === wordOfTheDay) {
-      return "correct";
+      return 'correct'
     }
   }
-};
+}
 
-module.exports = checkCurrentRow;
+module.exports = checkCurrentRow
