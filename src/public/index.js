@@ -60,13 +60,16 @@ function removeLetter () {
 }
 
 generateBoard()
+
+// function physicalKeyBoard () {
 // letter input from keyboard, later should be updated to work with on screen keyboard-just used to visually check its working
 document.addEventListener('keypress', (event) => {
   const letter = event.key
-  console.log('this is letter', letter)
+  console.log(event.code)
   addLetter(letter)
 })
-
+// }
+// physicalKeyBoard()
 const keyboard = document.querySelector('.keyContainer')
 
 const keys = [
