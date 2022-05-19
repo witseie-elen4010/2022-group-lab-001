@@ -1,32 +1,22 @@
-const validLogins = [
-  {
-    username: 'admin',
-    password: 'user'
-  }
-]
+const validate = require('validateLogin')
 
-function validate () {
+const button = document.getElementById('addButton')
+button.addEventListener('click', function () {
+  // hard coded temporarily
+  const validLogins = [
+    {
+      username: 'admin',
+      password: 'user'
+    }
+  ]
   const username = document.getElementById('username').value
   const password = document.getElementById('password').value
-  let found = false
-  validLogins.every(validLogin => {
-    if (username === validLogin.username && password === validLogin.password) {
-      found = true
-      alert('login succesful')
-      console.log('login succesful')
-      // break out of loop
-      return false
-    }
-    // if login doesn't match, iterate
-    return true
-  })
-  // no matching logins found
-  if (!found) {
-    alert('Invalid username or password')
-  }
-}
 
-// const submitButton = document.getElementById('submitbtn')
-// submitButton.addEventListener('click', function () {
-//   validate()
-// }, false)
+  if (validate(username, password, validLogins)) {
+    window.alert('Login succesful')
+    console.log('Login succesful')
+  } else {
+    window.alert('Invalid username or password')
+    console.log('Invalid username or password')
+  }
+}, false)
