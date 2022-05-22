@@ -1,6 +1,10 @@
-'use strict'
+'use strict';
 
-const wordOfTheDay = 'train'
+let wordOfTheDay = '';
+fetch('/word')
+  .then((res) => res.json())
+  .then((data) => (wordOfTheDay = data))
+  
 const messageContainer = document.querySelector('.messageContainer')
 
 const checkCurrentRow = (
@@ -76,9 +80,11 @@ function addLetter (letter) {
 function removeLetter () {
   if (currentTile > 0) {
     currentTile--
-    const tile = document.getElementById('boardRow-' + currentRow + '-tile-' + currentTile)
-    tile.textContent = ''
-    boardArray[currentRow][currentTile] = ''
+    const tile = document.getElementById(
+      'boardRow-' + currentRow + '-tile-' + currentTile
+    )
+    tile.textContent = '';
+    boardArray[currentRow][currentTile] = '';
   }
 }
 
@@ -129,7 +135,7 @@ const keys = [
 const handleClick = (letter) => {
   if (letter === 'Backspace') {
     removeLetter()
-    return
+    return;
   }
   addLetter(letter)
   if (letter === 'Enter') {
