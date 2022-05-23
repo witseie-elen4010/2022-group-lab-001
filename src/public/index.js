@@ -2,21 +2,8 @@
 
 const wordOfTheDay = 'train'
 const messageContainer = document.querySelector('.messageContainer')
+const keyboard = document.querySelector('.keyContainer')
 
-const checkCurrentRow = (
-  rowsOfGuesses,
-  currentRow,
-  currentElement,
-  wordOfTheDay
-) => {
-  console.log(currentElement)
-  if (currentElement === 5) {
-    const currentGuess = rowsOfGuesses[currentRow].join('').toLowerCase()
-    if (currentGuess === wordOfTheDay) {
-      messageContainer.textContent = 'Correct';
-    }
-  }
-}
 // private
 const tileDisplay = document.querySelector('.tileContainer')
 const boardArray = [
@@ -29,6 +16,36 @@ const boardArray = [
 ]
 let currentRow = 0
 let currentTile = 0
+const keys = [
+  'Q',
+  'W',
+  'E',
+  'R',
+  'T',
+  'Y',
+  'U',
+  'I',
+  'O',
+  'P',
+  'A',
+  'S',
+  'D',
+  'F',
+  'G',
+  'H',
+  'J',
+  'K',
+  'L',
+  'Enter',
+  'Z',
+  'X',
+  'C',
+  'V',
+  'B',
+  'N',
+  'M',
+  'Backspace'
+]
 
 // public
 
@@ -81,61 +98,31 @@ function removeLetter () {
     boardArray[currentRow][currentTile] = ''
   }
 }
-
-generateBoard()
-
-// function physicalKeyBoard () {
-// letter input from keyboard, later should be updated to work with on screen keyboard-just used to visually check its working
-document.addEventListener('keypress', (event) => {
-  const letter = event.key
-  console.log(event.code)
-  addLetter(letter)
-})
-// }
-// physicalKeyBoard()
-const keyboard = document.querySelector('.keyContainer')
-
-const keys = [
-  'Q',
-  'W',
-  'E',
-  'R',
-  'T',
-  'Y',
-  'U',
-  'I',
-  'O',
-  'P',
-  'A',
-  'S',
-  'D',
-  'F',
-  'G',
-  'H',
-  'J',
-  'K',
-  'L',
-  'Enter',
-  'Z',
-  'X',
-  'C',
-  'V',
-  'B',
-  'N',
-  'M',
-  'Backspace'
-]
+const checkCurrentRow = (
+  rowsOfGuesses,
+  currentRow,
+  currentElement,
+  wordOfTheDay
+) => {
+  console.log(currentElement)
+  if (currentElement === 5) {
+    const currentGuess = rowsOfGuesses[currentRow].join('').toLowerCase()
+    if (currentGuess === wordOfTheDay) {
+      messageContainer.textContent = 'Correct'
+    }
+  }
+}
 
 const handleClick = (letter) => {
   if (letter === 'Backspace') {
     removeLetter()
     return
   }
-  addLetter(letter)
   if (letter === 'Enter') {
-    console.log(letter)
     checkCurrentRow(boardArray, currentRow, currentTile, wordOfTheDay)
+    return
   }
+  addLetter(letter)
 }
 function generateKeyboard () {
   keys.forEach((key) => {
@@ -147,5 +134,14 @@ function generateKeyboard () {
     keyboard.append(buttonTag)
   })
 }
-
+function physicalKeyBoard () {
+// letter input from keyboard, later should be updated to work with on screen keyboard-just used to visually check its working
+  document.addEventListener('keydown', (event) => {
+    const letter = event.key
+    handleClick(letter)
+    console.log('this is back', event)
+  })
+}
+generateBoard()
+physicalKeyBoard()
 generateKeyboard()
