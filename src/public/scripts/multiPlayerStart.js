@@ -28,15 +28,16 @@ codeButton.addEventListener('click', e => {
   if (value === 0) {
     console.log('No radio selected')
     window.alert('Please Select a Number of Players')
-    console.log('Login unsuccesful')
   } else {
-    window.alert('Code for the game: ' + generateCode() + '.\nRemember the code and then click OK')
+    const newCode = generateCode()
+    window.alert('Code for the game: ' + newCode + '.\nRemember the code and then click OK')
+    window.location.href = ('../views/multi2/' + newCode)
   }
 })
 
 /* const startButton = document.getElementById('startGame')
-startButton.addEventListener('click', function () {
-  const code = document.getElementById('code').value
 
-}, false)
-*/
+startButton.addEventListener('click', e => {
+  e.preventDefault()
+  window.location.href = '../views/multi2'
+}, false) */

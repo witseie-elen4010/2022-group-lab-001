@@ -13,12 +13,14 @@ const checkCurrentRow = (
   if (currentElement === 5) {
     const currentGuess = rowsOfGuesses[currentRow].join('').toLowerCase()
     if (currentGuess === wordOfTheDay) {
-      messageContainer.textContent = 'Correct';
+      messageContainer.textContent = 'Correct'
     }
   }
 }
 // private
-const tileDisplay = document.querySelector('.tileContainer')
+const tileDisplay = document.querySelector('.tileContainer1')
+const tileDisplay2 = document.querySelector('.tileContainer2')
+
 const boardArray = [
   ['', '', '', '', ''],
   ['', '', '', '', ''],
@@ -47,6 +49,24 @@ function generateBoard () {
       rowElement.append(tileElement)
     })
     tileDisplay.append(rowElement)
+  })
+}
+
+function generateBoard2 () {
+  // Loop through each row and each tile to create the board
+  boardArray.forEach((boardRow, boardRowIndex) => {
+    const rowElement = document.createElement('div')
+    rowElement.setAttribute('id', 'boardRow-' + boardRowIndex)
+    boardRow.forEach((tile, tileIndex) => {
+      const tileElement = document.createElement('div')
+      tileElement.setAttribute(
+        'id',
+        'boardRow-' + boardRowIndex + '-tile-' + tileIndex
+      )
+      tileElement.classList.add('tile')
+      rowElement.append(tileElement)
+    })
+    tileDisplay2.append(rowElement)
   })
 }
 function getCurrentPosition (previousRow, previousTile) {
@@ -83,6 +103,7 @@ function removeLetter () {
 }
 
 generateBoard()
+generateBoard2()
 
 // function physicalKeyBoard () {
 // letter input from keyboard, later should be updated to work with on screen keyboard-just used to visually check its working
