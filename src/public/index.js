@@ -138,8 +138,7 @@ function physicalKeyBoard () {
 // letter input from keyboard, later should be updated to work with on screen keyboard-just used to visually check its working
   document.addEventListener('keydown', (event) => {
     const letter = event.key
-    handleClick(letter)
-    console.log('this is back', event)
+    if (letter === 'Backspace' || letter === 'Enter') { handleClick(letter) } else { handleClick(letter.toUpperCase()) }
   })
 }
 generateBoard()
