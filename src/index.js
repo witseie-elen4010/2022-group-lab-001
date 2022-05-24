@@ -4,7 +4,7 @@ const express = require('express')
 const app = express() // client asks server for a file (by URL)
 const serv = require('http').createServer(app)
 // const fs = require('fs')
-
+const mWordle = require('./mWordle')
 const bodyParser = require('body-parser')
 const mainRouter = require('./mainRoutes.js')
 const gameRouter = require('./gameRoutes.js')
@@ -22,14 +22,7 @@ app.set('view engine', 'html')
 
 const io = require('socket.io')(serv)
 io.sockets.on('connection', (socket) => {
-  console.log(socket.id)
-  console.log('Client connected...')
-
-  socket.on('chat', function (data) {
-    console.log('from server' + data)
-    socket.broadcast.emit('chat', data)
-    socket.emit('chat', data)
-  })
+  mWordle.initGame(io, socket)
 })
 
 const port = process.env.PORT || 3000
