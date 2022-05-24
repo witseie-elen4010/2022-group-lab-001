@@ -31,13 +31,7 @@ codeButton.addEventListener('click', e => {
   } else {
     const newCode = generateCode()
     window.alert('Code for the game: ' + newCode + '.\nRemember the code and then click OK')
-    window.location.href = ('../views/multi2/' + newCode)
+    // window.location.href = ('../views/multi2/' + newCode)
+    window.location.href = ('../views/multi2')
   }
 })
-
-/* const startButton = document.getElementById('startGame')
-
-startButton.addEventListener('click', e => {
-  e.preventDefault()
-  window.location.href = '../views/multi2'
-}, false) */
