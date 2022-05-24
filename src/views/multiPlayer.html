@@ -5,9 +5,8 @@
     <title>MULTIWORDLE</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="/cdn/style.css" />
-    <script defer src="/cdn/scripts/multiPlayerStart.js"></script>
-    
 
+    
 
 </head>
 
@@ -40,12 +39,13 @@
 <h4>
     When you are ready to begin, click 'Start Game'
 </h4>
-        <form action="multi2" method="get">
-            <button type="submit" id="startGame" class="Button">Start Game</button>
-        </form>
+        <button id="startGame" class="Button">Start Game</button>
         </div>
     </div>
+<script type="module" src="/socket.io/socket.io.js"></script>
+<script src='/jquery/dist/jquery.js'></script>
+<script type="module" src="/cdn/scripts/multiPlayerStart.js"></script>
 
 </body>
-<script src="/cdn/index.js" ></script>
+
 </html>

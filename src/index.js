@@ -2,7 +2,7 @@
 
 const express = require('express')
 const app = express() // client asks server for a file (by URL)
-const serv = require('http').Server(app)
+const serv = require('http').createServer(app)
 // const fs = require('fs')
 
 const bodyParser = require('body-parser')
@@ -13,17 +13,27 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use('/', mainRouter)
+app.use(express.static('node_modules'))
 app.use('/cdn', express.static('public'))
 app.use('/views', gameRouter)
 
-// module.exports(app)
 app.engine('html', require('ejs').renderFile)
 app.set('view engine', 'html')
 
-const port = process.env.PORT || 3000
-serv.listen(port)
-// app.listen(port)
-// const x = require('./config/socket.js')(serv)
+const io = require('socket.io')(serv)
+io.sockets.on('connection', (socket) => {
+  console.log(socket.id)
+  console.log('Client connected...')
 
+  socket.on('chat', function (data) {
+    console.log('from server' + data)
+    socket.broadcast.emit('chat', data)
+    socket.emit('chat', data)
+  })
+})
+
+const port = process.env.PORT || 3000
+module.exports = io
+serv.listen(port)
 module.exports = app
 console.log('Express server running on port\n', port)

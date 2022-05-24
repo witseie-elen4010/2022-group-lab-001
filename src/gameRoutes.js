@@ -1,5 +1,4 @@
 'use strict'
-
 const path = require('path')
 
 const express = require('express')
@@ -22,6 +21,7 @@ router.get('/multi2', function (req, res) {
   res.sendFile(path.join(__dirname, 'views', 'multi2.html'))
 })
 
+/*
 // render multiplayer page based on code generated
 router.get('/multi2/newCode', function (req, res) {
   const newCode = req.params.newCode
@@ -30,4 +30,5 @@ router.get('/multi2/newCode', function (req, res) {
     newCode
   })
 })
+*/
 module.exports = router
