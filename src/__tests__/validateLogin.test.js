@@ -1,5 +1,5 @@
 /* eslint-env jest */
-const loginServer = require('../loginServer')
+const loginServer = require('../controllers/loginController')
 const login = loginServer.login
 const signup = loginServer.signup
 
