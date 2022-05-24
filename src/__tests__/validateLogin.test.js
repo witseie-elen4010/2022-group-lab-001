@@ -1,5 +1,5 @@
 /* eslint-env jest */
-const validate = require('./validateLogin')
+const validate = require('../validateLogin')
 
 const validLogins = [
   {
