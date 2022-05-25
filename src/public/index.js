@@ -1,6 +1,5 @@
 'use strict'
 
-const wordOfTheDay = 'train'
 const messageContainer = document.querySelector('.messageContainer')
 const keyboard = document.querySelector('.keyContainer')
 
@@ -46,8 +45,6 @@ const keys = [
   'M',
   'Backspace'
 ]
-
-// public
 
 function generateBoard () {
   // Loop through each row and each tile to create the board
@@ -98,28 +95,57 @@ function removeLetter () {
     boardArray[currentRow][currentTile] = ''
   }
 }
-const checkCurrentRow = (
-  rowsOfGuesses,
-  currentRow,
-  currentElement,
-  wordOfTheDay
-) => {
-  console.log(currentElement)
-  if (currentElement === 5) {
-    const currentGuess = rowsOfGuesses[currentRow].join('').toLowerCase()
-    if (currentGuess === wordOfTheDay) {
-      messageContainer.textContent = 'Correct'
+// HandleEnter()
+function checkCurrentRow () {
+  if (currentTile > 4) {
+    const currentGuess = boardArray[currentRow].join('').toLowerCase()
+    const guess = { guess: currentGuess }
+    // need to fetch the response to if the word is valid from backend function Ryan is creating
+    // fetch(`http://localhost:8000/check/?word=${currentGuess}`)
+    // .then(response => response.json())
+    // .then(json => {
+    const json1 = 'Valid word'
+    if (json1 === 'Invalid Word') {
+      feedbackForGuess('Invalid Word')
+      // delete letters in the row
+    } else {
+      const options = {
+        method: 'POST',
+
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(guess)
+      }
+      fetch('/word', options)
+        .then((res) => res.json())
+        .then((wordOfTheDay) => {
+          console.log(wordOfTheDay)
+          if (wordOfTheDay === 'word of the day') {
+            feedbackForGuess('Correct')
+          } else {
+            if (currentRow === 5) {
+              feedbackForGuess('Try again tomorrow')
+            }
+
+            if (currentRow < 5) {
+              feedbackForGuess('Try again')
+              currentRow = currentRow + 1
+              currentTile = 0
+            }
+          }
+        })
     }
+    // }).catch(err => console.log(err))
   }
 }
-
 const handleClick = (letter) => {
   if (letter === 'Backspace') {
     removeLetter()
     return
   }
   if (letter === 'Enter') {
-    checkCurrentRow(boardArray, currentRow, currentTile, wordOfTheDay)
+    checkCurrentRow()
     return
   }
   addLetter(letter)
@@ -140,6 +166,12 @@ function physicalKeyBoard () {
     const letter = event.key
     if (letter === 'Backspace' || letter === 'Enter') { handleClick(letter) } else { handleClick(letter.toUpperCase()) }
   })
+}
+function feedbackForGuess (feedback) {
+  const feedbackElement = document.createElement('p')
+  feedbackElement.textContent = feedback
+  messageContainer.append(feedbackElement)
+  setTimeout(() => messageContainer.removeChild(feedbackElement), 1000)
 }
 generateBoard()
 physicalKeyBoard()
