@@ -1,44 +1,41 @@
 'use strict'
 
 let io
-let gameSocket
-exports.initGame = function (sio, socket) {
-  gameSocket = socket
-  io = sio
+let wordleSocket
+
+exports.initGame = function (IO, socket) {
+  wordleSocket = socket
+  io = IO
   console.log(socket.id)
   console.log('Client connected...')
   // host events
-  gameSocket.on('hostCreateNewGame', hostCreateNewGame)
-  gameSocket.on('hostRoomFull', hostPrepareGame)
-  gameSocket.on('hostCountdownFinished', hostStartGame)
+  wordleSocket.on('hostCreateNewGame', hostCreateNewGame)
+  wordleSocket.on('hostRoomFull', setupGame)
+  wordleSocket.on('tellHostGameStarting', startGame)
   // player events
-  gameSocket.on('playerJoinGame', playerJoinGame)
-  gameSocket.on('gameWinner', letOthersKnowWinner)
+  wordleSocket.on('playerJoinGame', playerJoinGame)
+  wordleSocket.on('gameWinner', letOthersKnowWinner)
 }
 
 function hostCreateNewGame () {
   // Create a unique Socket.IO Room
-  const thisGameId = (Math.random() * 10000) | 0
+  const GameId = (Math.random() * 10000) | 0
 
-  // Return the Room ID (gameId) and the socket ID (mySocketId) to the browser client
-  this.emit('newGameCreated', { gameId: thisGameId, mySocketId: this.id })
-
-  console.log(thisGameId)
-  // Join the Room and wait for the players
-  this.join(thisGameId)
+  // Return Room ID (gameId) and the socket ID (mySocketId) to the browser client
+  this.emit('gameCreated', { gameId: GameId, mySocketId: this.id })
+  this.join(GameId)
 };
 
-function hostPrepareGame (gameId) {
+function setupGame (gameId) {
   const sock = this
   const data = {
     mySocketId: sock.id,
     gameId
   }
-  console.log('All Players Present. Preparing game...')
-  io.sockets.in(data.gameId).emit('beginNewGame', data)
+  io.sockets.in(data.gameId).emit('beginGame', data)
 }
 
-function hostStartGame (gameId) {
+function startGame (gameId) {
   console.log('Game Started.')
   // sendWord(0, gameId) // this would be for the option of one player choosing the word.
 };
@@ -52,33 +49,27 @@ function hostStartGame (gameId) {
 function playerJoinGame (data) {
   console.log('Player ' + data.playerName + ' is attempting to join game: ' + data.gameId)
 
-  // A reference to the player's Socket.IO socket object
   const sock = this
 
-  // Look up the room ID in the Socket.IO manager object.
-  const room = gameSocket.adapter.rooms.has(data.gameId)
-  // If the room exists...
+  const room = wordleSocket.adapter.rooms.has(data.gameId)
+  // If the room existsmn
   console.log('Room=' + room)
-  if (gameSocket.adapter.rooms.has(data.gameId)) {
+  if (wordleSocket.adapter.rooms.has(data.gameId)) {
     // attach the socket id to the data object.
     data.mySocketId = sock.id
-
-    // Join the room
-    // sock.join(data.gameId)
-    gameSocket.join(data.gameId)
+    wordleSocket.join(data.gameId)
 
     console.log('Player ' + data.playerName + ' joining game: ' + data.gameId)
 
-    // Emit an event notifying the clients that the player has joined the room.
     io.sockets.in(data.gameId).emit('playerJoinedRoom', data)
   } else {
-    // Otherwise, send an error message back to the player.
     this.emit('error', { message: 'This room does not exist.' })
   }
 }
 
 function letOthersKnowWinner (data) {
-  console.log('Winner is' + data)
-  io.sockets.in(data).emit('winner', 'your opponent')
-  this.emit('winner', data)
+  // tell clients if someone won
+  console.log('Winner is' + data.myRole)
+  io.sockets.in(data.gameId).emit('winner', data)
+  // this.emit('winner', data)
 }

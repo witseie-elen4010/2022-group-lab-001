@@ -23,7 +23,7 @@
                 MULTIWORDLE
             </div>
 
-            <div class="buttons">
+            <div style= 'text-align:center' class="buttons">
 
                 <button id="btnCreateGame" class="Button">CREATE</button>
                 <button id="btnJoinGame" class="Button">JOIN</button>
@@ -38,10 +38,8 @@
     <script id="create-game-template" type="text/template">
         <div class="createGameWrapper">
 
-            <div id="gameURL" class="infoBig">Error!</div>
-
             <div class="info"> Game ID:</div>
-            <div id="spanNewGameCode" class="gameId">Error!</div>
+            <div id="spanNewGameCode" class="gameId"></div>
 
             <div id="playersWaiting"></div>
         </div>
@@ -70,72 +68,26 @@
     <!-- This is the 'Host' screen. It displays the word for each player to match -->
     <script id="host-game-template" type="text/template">
         <div id="wordArea">
-            <div id="hostWord">5</div>
         </div>
-        <div id="playerScores">
-            <div id="player1Score" class="playerScore">
-                <span class="score">0</span><span class="playerName">Player 1</span>
-            </div>
-            <div id="player2Score" class="playerScore">
-                <span class="playerName">Player 2</span><span class="score">0</span>
-            </div>
-        </div>
+        
 <div class="gameContainer">
             <div class="title">
                   <h1>MULTIWORDLE Multi PLAYER</h1>
                   <h3>You have 6 opportunities to guess the correct 5-letter word. Good luck!</h3>
             </div>
-
             <div class="messageContainer"></div>
             <div class = 'TITLECONTAINERS'>
             <div class="tileContainer1"></div>
             <div class="tileContainer2"></div>
             </div>
             <div class="keyContainer"></div>
-            
       </div>
-
-      <script id="player-game-template" type="text/template">
-        <div id="playerScores">
-            <div id="player1Score" class="playerScore">
-                <span class="score">0</span><span class="playerName">Player 1</span>
-            </div>
-            <div id="player2Score" class="playerScore">
-                <span class="playerName">Player 2</span><span class="score">0</span>
-            </div>
-        </div>
-<div class="gameContainer">
-            <div class="title">
-                  <h1>MULTIWORDLE Multi PLAYER</h1>
-                  <h3>You have 6 opportunities to guess the correct 5-letter word. Good luck!</h3>
-            </div>
-
-            <div class="messageContainer"></div>
-            <div class = 'TITLECONTAINERS'>
-            <div class="tileContainer1"></div>
-            <div class="tileContainer2"></div>
-            </div>
-            <div class="keyContainer"></div>
-            
-      </div>
-
 
     </script>
 
-
-  
-    
 <script src="/socket.io/socket.io.js"></script>
 <script src="/cdn/libs/jquery-2.0.2.min.js"></script>
-
-<!-- TextFit resizes text to fill a container.
-        It's used so the titles and game words fit properly on any size screen.
-        https://github.com/STRML/textFit   -->
-<script src="/cdn/libs/textFit.min.js"></script>
-
-<!-- FastClick is used to eliminate the 300ms delay when clicking items on a mobile device
-        https://github.com/ftlabs/fastclick -->
-<script src="/cdn/libs/fastclick.js"></script><script type="module" src="/cdn/playMulti.js"></script>
+<script type="module" src="/cdn/playMulti.js"></script>
 </body>
 
 </html>

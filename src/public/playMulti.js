@@ -10,9 +10,9 @@ jQuery(function ($) {
 
     bindEvents: function () {
       IO.socket.on('connected', IO.onConnected)
-      IO.socket.on('newGameCreated', IO.onNewGameCreated)
+      IO.socket.on('gameCreated', IO.onNewGameCreated)
       IO.socket.on('playerJoinedRoom', IO.playerJoinedRoom)
-      IO.socket.on('beginNewGame', IO.beginNewGame)
+      IO.socket.on('beginGame', IO.beginGame)
       IO.socket.on('newWordData', IO.onNewWordData)
       IO.socket.on('winner', IO.othersKnowIfYouWon)
     },
@@ -30,8 +30,8 @@ jQuery(function ($) {
       App[App.myRole].updateWaitingScreen(data)
     },
 
-    beginNewGame: function (data) {
-      App[App.myRole].gameCountdown(data)
+    beginGame: function (data) {
+      App[App.myRole].displayGame(data)
     },
     onNewWordData: function (data) {
       // Update the current round
@@ -40,7 +40,6 @@ jQuery(function ($) {
       App[App.myRole].newWord(data)
     },
     othersKnowIfYouWon: function (data) {
-      console.log('Winner1 is' + data)
       App[App.myRole].declareWinner(data)
     }
 
@@ -56,9 +55,6 @@ jQuery(function ($) {
       App.cacheElements()
       App.showInitScreen()
       App.bindEvents()
-
-      // Initialize the fastclick library
-      FastClick.attach(document.body)
     },
 
     cacheElements: function () {
@@ -104,7 +100,6 @@ jQuery(function ($) {
         App.mySocketId = data.mySocketId
         App.myRole = 'Host'
         App.Host.numPlayersInRoom = 0
-
         App.Host.displayNewGameScreen()
       },
 
@@ -116,6 +111,7 @@ jQuery(function ($) {
         $('#spanNewGameCode').text(App.gameId)
       },
 
+      // for multiple players
       updateWaitingScreen: function (data) {
         // If this is a restarted game, show the screen.
         if (App.Host.isNewGame) {
@@ -141,16 +137,16 @@ jQuery(function ($) {
       },
 
       declareWinner: function (data) {
-        console.log('Winner2 is' + data)
+        console.log('Winner2 is' + data.myRole)
         const messageContainer = document.querySelector('.messageContainer')
-        const text = data + ' Won!'
+        const text = data.myRole + ' Won!'
         messageContainer.append(text)
       },
 
-      gameCountdown: function () {
+      displayGame: function () {
         // Prepare the game screen with new HTML
         App.$gameArea.html(App.$hostGame)
-        IO.socket.emit('hostCountdownFinished', App.gameId)
+        IO.socket.emit('tellHostGameStarting', App.gameId)
         // Display the players' names on screen
         /* $('#player1Score')
           .find('.playerName')
@@ -170,7 +166,11 @@ jQuery(function ($) {
             const currentGuess = rowsOfGuesses[currentRow].join('').toLowerCase()
             if (currentGuess === wordOfTheDay) {
               messageContainer.textContent = 'Correct'
-              IO.socket.emit('gameWinner', App.gameId)
+              const data = {
+                myRole: App.myRole,
+                gameId: App.gameId
+              }
+              IO.socket.emit('gameWinner', data)
             }
           }
         }
@@ -371,17 +371,18 @@ jQuery(function ($) {
       },
 
       declareWinner: function (data) {
-        console.log('Winner2 is' + data)
+        console.log('Winner2 is' + data.myRole)
         const messageContainer = document.querySelector('.messageContainer')
-        const text = 'The host probably' + ' Won!'
+        const text = data.myRole + ' Won!'
         messageContainer.append(text)
       },
 
-      gameCountdown: function (hostData) {
+      displayGame: function (hostData) {
         App.Player.hostSocketId = hostData.mySocketId
-        $('#gameArea')
-          .html('<div class="gameOver">Get Ready!</div>')
-        App.$gameArea.html(App.$hostGame)
+        // $('#gameArea')
+        // .html('<div class="gameOver">Get Ready!</div>')
+
+        App.$gameArea.html(App.$playerGame)
         IO.socket.emit('hostCountdownFinished', App.gameId)
         // Display the players' names on screen
         /* $('#player1Score')
@@ -403,7 +404,11 @@ jQuery(function ($) {
             const currentGuess = rowsOfGuesses[currentRow].join('').toLowerCase()
             if (currentGuess === wordOfTheDay) {
               messageContainer.textContent = 'Correct  '
-              IO.socket.emit('gameWinner', 'player')
+              const data = {
+                myRole: App.myName,
+                gameId: App.gameId
+              }
+              IO.socket.emit('gameWinner', data)
             }
           }
         }
