@@ -33,6 +33,27 @@ signupButton.addEventListener('click', e => {
   }
 
   // happy case
-  window.alert('Account created successfully')
-  console.log(`Successfully logged in as ${email}`)
+  const signupDetails = {
+    email: signupForm.email.value,
+    password: signupForm.password.value,
+    confirmPassword: signupForm.confirmPassword.value
+  }
+  console.log(signupDetails)
+  const options = {
+    method: 'POST',
+    body: JSON.stringify(signupDetails),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }
+  fetch('../loginapi/signup', options)
+    .then(response => {
+      response.text().then(message => window.alert(message))
+      if (response.ok) {
+        window.location.href = '../views/index'
+      }
+      // else {
+      //   window.alert('OOPS')
+      // }
+    })
 }, false)
