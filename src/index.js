@@ -5,6 +5,7 @@ const app = express()
 const bodyParser = require('body-parser')
 const mainRouter = require('./mainRoutes.js')
 const gameRouter = require('./gameRoutes.js')
+const loginController = require('./controllers/loginController')
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -12,6 +13,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use('/', mainRouter)
 app.use('/cdn', express.static('public'))
 app.use('/views', gameRouter)
+app.use('/loginapi', loginController)
 
 // module.exports(app)
 
