@@ -7,20 +7,15 @@ exports.initGame = function (sio, socket) {
   io = sio
   console.log(socket.id)
   console.log('Client connected...')
-  /* gameSocket.on('chat', function (data) {
-    console.log('from server' + data)
-    gameSocket.broadcast.emit('chat', data)
-    gameSocket.emit('chat', data)
-*/
   // host events
   gameSocket.on('hostCreateNewGame', hostCreateNewGame)
   gameSocket.on('hostRoomFull', hostPrepareGame)
   gameSocket.on('hostCountdownFinished', hostStartGame)
   // player events
   gameSocket.on('playerJoinGame', playerJoinGame)
+  gameSocket.on('gameWinner', letOthersKnowWinner)
 }
 
-// when start game button clicked
 function hostCreateNewGame () {
   // Create a unique Socket.IO Room
   const thisGameId = (Math.random() * 10000) | 0
@@ -48,10 +43,11 @@ function hostStartGame (gameId) {
   // sendWord(0, gameId) // this would be for the option of one player choosing the word.
 };
 
-function sendWord (word, gameId) {
+/* function sendWord (word, gameId) {
   const data = 'hello'
   io.sockets.in(gameId).emit('newWordData', data)
 }
+*/
 
 function playerJoinGame (data) {
   console.log('Player ' + data.playerName + ' is attempting to join game: ' + data.gameId)
@@ -79,4 +75,10 @@ function playerJoinGame (data) {
     // Otherwise, send an error message back to the player.
     this.emit('error', { message: 'This room does not exist.' })
   }
+}
+
+function letOthersKnowWinner (data) {
+  console.log('Winner is' + data)
+  io.sockets.in(data).emit('winner', 'your opponent')
+  this.emit('winner', data)
 }
