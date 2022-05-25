@@ -2,8 +2,7 @@
 const dictionary = require("../models/dictionary");
 const validWords = dictionary.getDictionary();
 
-const getRandomIndexBasedOnDate = () => {
-  const date = new Date();
+const getRandomIndexBasedOnDate = (date) => {
   return (
     (date.getFullYear() * date.getDate() * (date.getMonth() + 1)) %
     validWords.length
@@ -11,10 +10,12 @@ const getRandomIndexBasedOnDate = () => {
 };
 
 const getWordOfTheDay = (req, res) => {
-  const index = getRandomIndexBasedOnDate();
+  const date = new Date();
+  const index = getRandomIndexBasedOnDate(date);
   res.json(validWords[index]);
 };
 
 module.exports = {
   getWordOfTheDay,
+  getRandomIndexBasedOnDate,
 };
