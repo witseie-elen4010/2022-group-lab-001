@@ -5,47 +5,83 @@
     <title>MULTIWORDLE</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="/cdn/style.css" />
-    <script defer src="/cdn/scripts/multiPlayerStart.js"></script>
-    
 
-
-</head>
 
 <body>
-    <div class="game">
 
-        <div class="title">
-            <h1>MULTIWORDLE MULTIPLAYER</h1>
-        </div>
-        <br>
-        <br>
-        <br>
-        <br>
-        
-            <h3>
-                Select the number of players you want to play with (including you)
-            </h3>
-            <input type="radio" name="players" value="multi2"> 2 Players<br>
-            <input type="radio" name="players" value="multi3"> 3 Players<br>
-            <input type="radio" name="players" value="multi4"> 4 Players<br>
-            <button id="generateCode" class="Button">Generate Code to send to your friends</button>
-            <br>
 
-            <div class = 'code-entering'>
-            <h4>
-                And/Or Enter a code
-            </h4>
-            <input type="text" id="code" name="code">
-            <br>
-<h4>
-    When you are ready to begin, click 'Start Game'
-</h4>
-        <form action="multi2" method="get">
-            <button type="submit" id="startGame" class="Button">Start Game</button>
-        </form>
-        </div>
+    <div id="gameArea">
+        <!-- This is where the templates defined below will be used -->
     </div>
 
+    <!-- Main Title Screen that appears when the page loads for the first time -->
+    <script id="intro-screen-template" type="text/template">
+
+        <div class="titleWrapper">
+
+            <div class="title">
+                MULTIWORDLE
+            </div>
+
+            <div style= 'text-align:center' class="buttons">
+
+                <button id="btnCreateGame" class="Button">CREATE</button>
+                <button id="btnJoinGame" class="Button">JOIN</button>
+                <div style="clear:both"></div>
+            </div>
+
+        </div>
+
+    </script>
+
+    <!-- This screen appears when a user clicks "CREATE" on the Title Screen -->
+    <script id="create-game-template" type="text/template">
+        <div style= 'text-align:center' class="createGameWrapper">
+            <div class="info"> Game ID:</div>
+            <div id="spanNewGameCode" class="gameId"></div>
+
+            <div id="playersWaiting"></div>
+        </div>
+    </script>
+
+    <!-- This screen appears when a player clicks "JOIN" on the Title Screen -->
+    <button id="btnStart" style= 'display: none;' class = 'Button'>START</button>
+    <script id="join-game-template" type="text/template">
+        <div style= 'text-align:center' class="joinGameWrapper">
+            <div class="info">
+                <input id="inputPlayerName" type="text" placeholder = 'your name' />
+            </div>
+
+            <div class="info">
+                <input id="inputGameId" type="text" placeholder = 'Game ID' />
+            </div>
+                <div id="playerWaitingMessage"></div>
+           
+        </div>
+    </script>
+
+    <!-- This is the 'Host' screen. It displays the word for each player to match -->
+    <script id="host-game-template" type="text/template">
+        <div id="wordArea">
+        </div>
+        
+<div class="gameContainer">
+            <div class="title">
+                  <h1>MULTIWORDLE Multi PLAYER</h1>
+                  <h3>You have 6 opportunities to guess the correct 5-letter word. Good luck!</h3>
+            </div>
+            <div class="messageContainer"></div>
+            <div class = 'TITLECONTAINERS'>
+            <div class="tileContainer1"></div>
+            <div class="tileContainer2"></div>
+            </div>
+            <div class="keyContainer"></div>
+      </div>
+
+    </script>
+
+<script src="/socket.io/socket.io.js"></script>
+<script type="module" src="/cdn/playMulti.js"></script>
 </body>
-<script src="/cdn/index.js" ></script>
+
 </html>

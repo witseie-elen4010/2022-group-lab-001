@@ -1,5 +1,4 @@
 'use strict'
-
 const path = require('path')
 
 const express = require('express')
@@ -21,17 +20,5 @@ router.get('/singlePlayer', function (req, res) {
 
 router.get('/multiPlayer', function (req, res) {
   res.sendFile(path.join(__dirname, 'views', 'multiPlayer.html'))
-})
-router.get('/multi2', function (req, res) {
-  res.sendFile(path.join(__dirname, 'views', 'multi2.html'))
-})
-
-// render multiplayer page based on code generated
-router.get('/multi2/newCode', function (req, res) {
-  const newCode = req.params.newCode
-  res.render('/multi2', {
-    title: ' Game ' + newCode,
-    newCode
-  })
 })
 module.exports = router
