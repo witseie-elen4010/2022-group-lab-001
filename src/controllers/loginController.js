@@ -2,6 +2,8 @@
 
 const Joi = require('joi')
 const bcrypt = require('bcrypt')
+
+// TODO: add passport (next sprint)
 // const passport = require('passport')
 // const initialisePassport = require('./passport-config')
 // const flash = require('express-flash')
@@ -41,33 +43,11 @@ const login = async (req, res) => {
 
     // happy case
     res.status(200).send('Login successful')
-    // res.redirect(req.url + '../../views/index')
     return true
   } catch {
     res.redirect('/login')
   }
 }
-
-// (req, res) => {
-//   // validation
-//   const schema = Joi.object({
-//     email: Joi.string().email().required(),
-//     password: Joi.string().min(8).required()
-//   })
-//   const { error } = schema.validate(req.body)
-//   if (error) {
-//     res.status(400).send(error.details[0].message)
-//     return
-//   }
-
-//   const login = logins.find(lgn => lgn.email === req.body.email && lgn.password === req.body.password)
-//   if (!login) {
-//     res.status(404).send('Invalid username or password')
-//   }
-
-//   // happy case
-//   res.status(200).send('Login successful')
-// })
 
 const signup = async (req, res) => {
   // validation
@@ -109,46 +89,6 @@ const signup = async (req, res) => {
 }
 
 const getUsers = () => users
-
-// function login (username, password, validLogins) {
-//   let found = false
-//   validLogins.every(validLogin => {
-//     if (username === validLogin.username && password === validLogin.password) {
-//       found = true
-//       // break out of loop
-//       return false
-//     }
-//     // if login doesn't match, iterate
-//     return true
-//   })
-//   if (found) {
-//     // login successful
-//     return true
-//   } else {
-//     return false
-//   }
-// }
-
-// function signup (signupDetails) {
-//   // validation
-
-//   if (error) {
-//     return false
-//   }
-//   if (password.length < 8) {
-//     return false
-//   }
-//   if (password === email) {
-//     return false
-//   }
-//   if (password !== confirmPassword) {
-//     return false
-//   }
-
-//   // happy case
-//   console.log(`Successfully logged in as ${email}`)
-//   return true
-// }
 
 module.exports.login = login
 module.exports.signup = signup
