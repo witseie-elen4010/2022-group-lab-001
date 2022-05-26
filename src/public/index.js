@@ -2,6 +2,7 @@
 
 const messageContainer = document.querySelector('.messageContainer')
 const keyboard = document.querySelector('.keyContainer')
+let isGameEnded=false
 
 // private
 const tileDisplay = document.querySelector('.tileContainer')
@@ -88,6 +89,7 @@ function addLetter (letter) {
 }
 
 function removeLetter () {
+
   if (currentTile > 0) {
     currentTile--
     const tile = document.getElementById('boardRow-' + currentRow + '-tile-' + currentTile)
@@ -95,13 +97,13 @@ function removeLetter () {
     boardArray[currentRow][currentTile] = ''
   }
 }
-
-function HandleEnter () {
+// HandleEnter()
+function checkCurrentRow () {
   if (currentTile > 4) {
     const currentGuess = boardArray[currentRow].join('').toLowerCase()
     const guess = { guess: currentGuess }
     // need to fetch the response to if the word is valid from backend function Ryan is creating
-    // fetch()
+    // fetch(`http://localhost:8000/check/?word=${currentGuess}`)
     // .then(response => response.json())
     // .then(json => {
     const json1 = 'Valid word'
@@ -123,9 +125,13 @@ function HandleEnter () {
           console.log(wordOfTheDay)
           if (wordOfTheDay === 'word of the day') {
             feedbackForGuess('Correct')
+            isGameEnded=true
+            
           } else {
             if (currentRow === 5) {
               feedbackForGuess('Try again tomorrow')
+              isGameEnded=true
+              return
             }
 
             if (currentRow < 5) {
@@ -136,18 +142,20 @@ function HandleEnter () {
           }
         })
     }
+    // }).catch(err => console.log(err))
   }
 }
 const handleClick = (letter) => {
-  if (letter === 'Backspace') {
-    removeLetter()
-    return
-  }
-  if (letter === 'Enter') {
-    HandleEnter()
-    return
-  }
-  addLetter(letter)
+  if(isGameEnded===false){
+    if (letter === 'Backspace') {
+      removeLetter()
+      return
+    }
+    if (letter === 'Enter') {
+      checkCurrentRow()
+      return
+    }
+  addLetter(letter)}
 }
 function generateKeyboard () {
   keys.forEach((key) => {
@@ -163,7 +171,7 @@ function physicalKeyBoard () {
 // letter input from keyboard, later should be updated to work with on screen keyboard-just used to visually check its working
   document.addEventListener('keydown', (event) => {
     const letter = event.key
-    if (letter === 'Backspace' || letter === 'Enter') { handleClick(letter) } else if (letter.length==1) { handleClick(letter.toUpperCase()) }
+    if (letter === 'Backspace' || letter === 'Enter') { handleClick(letter) } else if (letter.length===1) { handleClick(letter.toUpperCase()) }
   })
 }
 function feedbackForGuess (feedback) {
