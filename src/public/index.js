@@ -83,6 +83,7 @@ function addLetter (letter) {
     tile.textContent = letter
     boardArray[currentRow][currentTile] = letter
     console.log('boardRow', boardArray)
+    tile.setAttribute('data', letter)
     const position = getCurrentPosition(previousRow, previousTile)
 
     currentRow = position.previousRow
@@ -113,6 +114,44 @@ const checkCurrentRow = (
   }
 }
 
+const requestFeedback = () => {
+  const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes // obtain all the children in the row
+  const guessedWord = []
+  // let colours = []
+  currentTiles.forEach(tile => {
+    guessedWord.push(tile.getAttribute('data'))
+  })
+  const guessJson = { guessJson: guessedWord }
+  const options = {
+    method: 'POST',
+
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(guessJson)
+  }
+  fetch('/word', options)
+    .then((res) => res.json())
+    .then((colours) => {
+      console.log('two', colours)
+      revealFeedback(colours)
+      // return colours
+    })
+}
+function revealFeedback (colours) {
+  const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes
+
+  // to change a colour or add an animation,we add the associated element to a classList which describes the visual desired.
+  // This will update it appropriately.This effectively calls a visual action through the asssigment of a tag to css code written in style.css
+  currentTiles.forEach((tile, index) => {
+    setTimeout(() => {
+      tile.classList.add('flip') // adding to flip classlist of the tile (causes flip animation)
+      tile.classList.add(colours[index])// asign each tile to the approriate colour class to change its colour
+      // adding
+    }, 300 * index)// ensure they dont all flip and change colour  at the same time, Higher indexes executed after more time
+  })
+}
+
 const handleClick = (letter) => {
   if (letter === 'Backspace') {
     removeLetter()
@@ -120,6 +159,8 @@ const handleClick = (letter) => {
   }
   if (letter === 'Enter') {
     checkCurrentRow(boardArray, currentRow, currentTile, wordOfTheDay)
+    // revealFeedback(requestFeedback())
+    requestFeedback()
     return
   }
   addLetter(letter)
@@ -134,14 +175,14 @@ function generateKeyboard () {
     keyboard.append(buttonTag)
   })
 }
-function physicalKeyBoard () {
-// letter input from keyboard, later should be updated to work with on screen keyboard-just used to visually check its working
+function activatePhysicalKeyBoard () {
   document.addEventListener('keydown', (event) => {
     const letter = event.key
     handleClick(letter)
     console.log('this is back', event)
   })
 }
+
 generateBoard()
-physicalKeyBoard()
+activatePhysicalKeyBoard()
 generateKeyboard()

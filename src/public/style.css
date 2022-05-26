@@ -155,3 +155,42 @@ body {
 .keyContainer button:nth-child(28) {
     width: 70px;
 }
+
+.tileContainer.tile.flip {
+    animation: 0.3s linear flipping;
+}
+
+@keyframes flipping {
+    0% {
+        transform: rotateY(0deg);
+    }
+    25% {
+        transform: rotateY(25deg);
+    }
+    50% {
+        transform: rotateY(50deg);
+    }
+
+    70% {
+        transform: rotateY(90deg);
+    }
+    100% {
+        transform: rotateY(0deg);
+    }
+}
+
+
+
+.grey-block {
+    background-color: #3a3a3c !important; 
+    border:none !important;
+}
+.yellow-block {
+    background-color: #3a4cb5 !important;
+    border:none !important;
+}
+
+.green-block {
+    background-color: #538d4e !important;
+    border:none !important;
+}
