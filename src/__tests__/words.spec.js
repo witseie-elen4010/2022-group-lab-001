@@ -1,16 +1,16 @@
 /* eslint-env jest */
-const request = require("supertest")
-const wordController = require("../controllers/wordController")
-const express = require("express")
+const request = require('supertest')
+const wordController = require('../controllers/wordController')
+const express = require('express')
 const app = express()
-const bodyParser = require("body-parser")
+const bodyParser = require('body-parser')
 
-const router = require("../routes/wordRoutes");
+const router = require('../routes/wordRoutes');
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
-app.use("/", router)
+app.use('/', router)
 
-const dictionary = require("../models/dictionary")
+const dictionary = require('../models/dictionary')
 const validWords = dictionary.getDictionary();
 
 describe('When making a request to /word', () => {
@@ -21,15 +21,15 @@ describe('When making a request to /word', () => {
   })
 })
 
-test("Testing post request to check if a word is equal to the word of the day the response is correct", async () => {
+test('Testing post request to check if a word is equal to the word of the day the response is correct', async () => {
   const wordOfTheDay = wordController.getWordOfTheDay()
   const body = { guess: wordOfTheDay };
-  const response = await request(app).post("/").send(body)
+  const response = await request(app).post('/').send(body)
   expect(response.statusCode).toBe(200)
   expect(response.body).toBe('word of the day')
 })
 
-test("Tests whether a new index is generated per day", () => {
+test('Tests whether a new index is generated per day', () => {
   const date1 = new Date()
   const date2 = new Date()
   date1.setFullYear(2022, 4, 2)
