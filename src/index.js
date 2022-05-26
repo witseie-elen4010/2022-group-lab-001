@@ -3,7 +3,6 @@
 const express = require('express')
 const app = express() // client asks server for a file (by URL)
 const serv = require('http').createServer(app)
-// const fs = require('fs')
 const mWordle = require('./mWordle')
 const bodyParser = require('body-parser')
 const mainRouter = require('./mainRoutes.js')
