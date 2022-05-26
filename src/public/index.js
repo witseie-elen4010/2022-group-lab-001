@@ -81,6 +81,7 @@ function addLetter(letter) {
     tile.textContent = letter
     boardArray[currentRow][currentTile] = letter
     console.log('boardRow', boardArray)
+    tile.setAttribute('data', letter)
     const position = getCurrentPosition(previousRow, previousTile)
 
     currentRow = position.previousRow
@@ -113,6 +114,49 @@ async function wordIsValid(guess) {
   return isValid
 }
 
+const requestFeedback = async () => {
+  const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes
+  const guessedWord = []
+  currentTiles.forEach(tile => {
+    guessedWord.push(tile.getAttribute('data'))
+  })
+  const guessJson = { guessJson: guessedWord }
+  const options = {
+    method: 'POST',
+
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(guessJson)
+  }
+
+  const response = await fetch('/word/getColours', options)
+  const colours = await response.json()
+  return colours
+}
+
+
+function revealFeedback(colours) {
+  const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes
+  currentTiles.forEach((tile, index) => {
+    setTimeout(() => {
+      tile.classList.add('flip') // (causes flip animation)
+      tile.classList.add(colours[index])// asign each tile to the approriate colour class to change its colour
+    }, 300 * index)// ensure they dont all flip and change colour  at the same time, Higher indexes executed after more time
+  })
+}
+
+// const handleClick = (letter) => {
+//   if (letter === 'Backspace') {
+//     removeLetter()
+//     return
+//   }
+//   if (letter === 'Enter') {
+//     checkCurrentRow(boardArray, currentRow, currentTile, wordOfTheDay)
+//     requestFeedback().then((colours) => revealFeedback(colours))
+//     return
+//   }
+// }
 // HandleEnter()
 function checkCurrentRow() {
   if (currentTile > 4) {
@@ -123,6 +167,7 @@ function checkCurrentRow() {
         feedbackForGuess('Invalid Word')
         // delete letters in the row
       } else {
+        requestFeedback().then((colours) => revealFeedback(colours))
         const options = {
           method: 'POST',
 
@@ -167,6 +212,7 @@ const handleClick = (letter) => {
     }
     if (letter === 'Enter') {
       checkCurrentRow()
+
       return
     }
     addLetter(letter)
@@ -182,8 +228,7 @@ function generateKeyboard() {
     keyboard.append(buttonTag)
   })
 }
-function physicalKeyBoard() {
-  // letter input from keyboard, later should be updated to work with on screen keyboard-just used to visually check its working
+function activatePhysicalKeyBoard() {
   document.addEventListener('keydown', (event) => {
     const letter = event.key
     if (letter === 'Backspace' || letter === 'Enter') { handleClick(letter) } else if (letter.length === 1) { handleClick(letter.toUpperCase()) }
@@ -196,5 +241,5 @@ function feedbackForGuess(feedback) {
   setTimeout(() => messageContainer.removeChild(feedbackElement), 1000)
 }
 generateBoard()
-physicalKeyBoard()
+activatePhysicalKeyBoard()
 generateKeyboard()
