@@ -1,8 +1,11 @@
 'use strict'
 
-const wordOfTheDay = 'train'
+let wordOfTheDay = ''
+fetch('/word')
+  .then((res) => res.json())
+  .then((data) => (wordOfTheDay = data))
+
 const messageContainer = document.querySelector('.messageContainer')
-const keyboard = document.querySelector('.keyContainer')
 
 const checkCurrentRow = (
   rowsOfGuesses,
@@ -31,6 +34,7 @@ const boardArray = [
 ]
 let currentRow = 0
 let currentTile = 0
+const keyboard = document.querySelector('.keyContainer')
 const keys = [
   'Q',
   'W',
@@ -108,7 +112,9 @@ function addLetter (letter) {
 function removeLetter () {
   if (currentTile > 0) {
     currentTile--
-    const tile = document.getElementById('boardRow-' + currentRow + '-tile-' + currentTile)
+    const tile = document.getElementById(
+      'boardRow-' + currentRow + '-tile-' + currentTile
+    )
     tile.textContent = ''
     boardArray[currentRow][currentTile] = ''
   }
@@ -136,11 +142,12 @@ function generateKeyboard () {
   })
 }
 function physicalKeyBoard () {
-// letter input from keyboard, later should be updated to work with on screen keyboard-just used to visually check its working
+  // letter input from keyboard, later should be updated to work with on screen keyboard-just used to visually check its working
   document.addEventListener('keydown', (event) => {
     const letter = event.key
-    handleClick(letter)
-    console.log('this is back', event)
+    if (letter !== 'Tab' && letter !== 'Meta' && letter !== 'Escape') {
+      handleClick(letter)
+    }
   })
 }
 generateBoard()
