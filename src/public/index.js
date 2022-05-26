@@ -114,10 +114,9 @@ const checkCurrentRow = (
   }
 }
 
-const requestFeedback = () => {
-  const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes // obtain all the children in the row
+const requestFeedback = async () => {
+  const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes 
   const guessedWord = []
-  // let colours = []
   currentTiles.forEach(tile => {
     guessedWord.push(tile.getAttribute('data'))
   })
@@ -130,24 +129,19 @@ const requestFeedback = () => {
     },
     body: JSON.stringify(guessJson)
   }
-  fetch('/word', options)
-    .then((res) => res.json())
-    .then((colours) => {
-      console.log('two', colours)
-      revealFeedback(colours)
-      // return colours
-    })
+ 
+const response = await fetch('/word/getColours', options)
+const colours = await response.json()
+return colours
 }
+
+
 function revealFeedback (colours) {
   const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes
-
-  // to change a colour or add an animation,we add the associated element to a classList which describes the visual desired.
-  // This will update it appropriately.This effectively calls a visual action through the asssigment of a tag to css code written in style.css
   currentTiles.forEach((tile, index) => {
     setTimeout(() => {
-      tile.classList.add('flip') // adding to flip classlist of the tile (causes flip animation)
+      tile.classList.add('flip') // (causes flip animation)
       tile.classList.add(colours[index])// asign each tile to the approriate colour class to change its colour
-      // adding
     }, 300 * index)// ensure they dont all flip and change colour  at the same time, Higher indexes executed after more time
   })
 }
@@ -159,8 +153,7 @@ const handleClick = (letter) => {
   }
   if (letter === 'Enter') {
     checkCurrentRow(boardArray, currentRow, currentTile, wordOfTheDay)
-    // revealFeedback(requestFeedback())
-    requestFeedback()
+     requestFeedback().then((colours) => revealFeedback(colours))
     return
   }
   addLetter(letter)

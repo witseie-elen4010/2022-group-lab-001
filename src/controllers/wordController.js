@@ -1,7 +1,5 @@
 'use strict'
 
-// const { get } = require('../routes/wordRoutes')
-
 const assignColours = (request, response) => {
   const wordOfTheDay = 'train'// needs to be obtained
  
@@ -21,19 +19,15 @@ const assignColours = (request, response) => {
     }
   })
 
-  // guess.forEach(letter => { console.log(letter) })
-
   guessedWord.forEach((letter, index) => {
     if (checkWordle.includes(letter)) {
-      colours[index] = 'yellow-block'
+      colours[index] = 'blue-block'
       checkWordle = checkWordle.replace(letter, '')// esnures we wont check letters that have already been dealt with
     }
   })
-  //  console.log('assign color called')
-  // guess.forEach(letter => { console.log(letter) })
-  // console.log('one', colours)
+
   response.json(colours)
-  // response.json('hello world')
+
 }
 const getWordOfTheDay = () => {
   return 'train'
