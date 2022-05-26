@@ -2,7 +2,7 @@
 
 const messageContainer = document.querySelector('.messageContainer')
 const keyboard = document.querySelector('.keyContainer')
-let isGameEnded=false
+let isGameEnded = false
 
 // private
 const tileDisplay = document.querySelector('.tileContainer')
@@ -47,7 +47,7 @@ const keys = [
   'Backspace'
 ]
 
-function generateBoard () {
+function generateBoard() {
   // Loop through each row and each tile to create the board
   boardArray.forEach((boardRow, boardRowIndex) => {
     const rowElement = document.createElement('div')
@@ -64,13 +64,13 @@ function generateBoard () {
     tileDisplay.append(rowElement)
   })
 }
-function getCurrentPosition (previousRow, previousTile) {
+function getCurrentPosition(previousRow, previousTile) {
   // for future functionality this must deal with the logic for deleting and element and for moving to the next row
   previousTile++
   return { previousRow, previousTile }
 }
 
-function addLetter (letter) {
+function addLetter(letter) {
   const previousRow = currentRow
   const previousTile = currentTile
   // to ensure we only enter 5 letters in one row
@@ -88,7 +88,7 @@ function addLetter (letter) {
   }
 }
 
-function removeLetter () {
+function removeLetter() {
 
   if (currentTile > 0) {
     currentTile--
@@ -97,56 +97,70 @@ function removeLetter () {
     boardArray[currentRow][currentTile] = ''
   }
 }
+
+async function wordIsValid(guess) {
+  const options = {
+    method: 'POST',
+
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(guess)
+  }
+  const response = await fetch('/word/wordIsValid', options)
+  const isValid = await response.json()
+
+  return isValid
+}
+
 // HandleEnter()
-function checkCurrentRow () {
+function checkCurrentRow() {
   if (currentTile > 4) {
     const currentGuess = boardArray[currentRow].join('').toLowerCase()
     const guess = { guess: currentGuess }
-    // need to fetch the response to if the word is valid from backend function Ryan is creating
-    // fetch(`http://localhost:8000/check/?word=${currentGuess}`)
-    // .then(response => response.json())
-    // .then(json => {
-    const json1 = 'Valid word'
-    if (json1 === 'Invalid Word') {
-      feedbackForGuess('Invalid Word')
-      // delete letters in the row
-    } else {
-      const options = {
-        method: 'POST',
+    wordIsValid(guess).then(isValid => {
+      if (!isValid) {
+        feedbackForGuess('Invalid Word')
+        // delete letters in the row
+      } else {
+        const options = {
+          method: 'POST',
 
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(guess)
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(guess)
+        }
+        fetch('/word/isWordOfTheDay', options)
+          .then((res) => res.json())
+          .then((wordOfTheDay) => {
+            console.log(wordOfTheDay)
+            if (wordOfTheDay === 'word of the day') {
+              feedbackForGuess('Correct')
+              isGameEnded = true
+
+            } else {
+              if (currentRow === 5) {
+                feedbackForGuess('Try again tomorrow')
+                isGameEnded = true
+                return
+              }
+
+              if (currentRow < 5) {
+                feedbackForGuess('Try again')
+                currentRow = currentRow + 1
+                currentTile = 0
+              }
+            }
+          })
       }
-      fetch('/word', options)
-        .then((res) => res.json())
-        .then((wordOfTheDay) => {
-          console.log(wordOfTheDay)
-          if (wordOfTheDay === 'word of the day') {
-            feedbackForGuess('Correct')
-            isGameEnded=true
-            
-          } else {
-            if (currentRow === 5) {
-              feedbackForGuess('Try again tomorrow')
-              isGameEnded=true
-              return
-            }
+    })
 
-            if (currentRow < 5) {
-              feedbackForGuess('Try again')
-              currentRow = currentRow + 1
-              currentTile = 0
-            }
-          }
-        })
-    }
     // }).catch(err => console.log(err))
   }
 }
 const handleClick = (letter) => {
-  if(isGameEnded===false){
+  if (isGameEnded === false) {
     if (letter === 'Backspace') {
       removeLetter()
       return
@@ -155,9 +169,10 @@ const handleClick = (letter) => {
       checkCurrentRow()
       return
     }
-  addLetter(letter)}
+    addLetter(letter)
+  }
 }
-function generateKeyboard () {
+function generateKeyboard() {
   keys.forEach((key) => {
     const buttonTag = document.createElement('button')
     buttonTag.textContent = key
@@ -167,14 +182,14 @@ function generateKeyboard () {
     keyboard.append(buttonTag)
   })
 }
-function physicalKeyBoard () {
-// letter input from keyboard, later should be updated to work with on screen keyboard-just used to visually check its working
+function physicalKeyBoard() {
+  // letter input from keyboard, later should be updated to work with on screen keyboard-just used to visually check its working
   document.addEventListener('keydown', (event) => {
     const letter = event.key
-    if (letter === 'Backspace' || letter === 'Enter') { handleClick(letter) } else if (letter.length===1) { handleClick(letter.toUpperCase()) }
+    if (letter === 'Backspace' || letter === 'Enter') { handleClick(letter) } else if (letter.length === 1) { handleClick(letter.toUpperCase()) }
   })
 }
-function feedbackForGuess (feedback) {
+function feedbackForGuess(feedback) {
   const feedbackElement = document.createElement('p')
   feedbackElement.textContent = feedback
   messageContainer.append(feedbackElement)
