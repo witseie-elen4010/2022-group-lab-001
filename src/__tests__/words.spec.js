@@ -15,7 +15,7 @@ const validWords = dictionary.getDictionary();
 
 describe('When making a request to /word', () => {
   it('should return a valid word for the day', async () => {
-    const word=wordController.getWordOfTheDay()
+    const word = wordController.getWordOfTheDay()
     expect(word.length).toBe(5)
     expect(validWords.includes(word)).toBe(true)
   })
@@ -23,10 +23,31 @@ describe('When making a request to /word', () => {
 
 test('Testing post request to check if a word is equal to the word of the day the response is correct', async () => {
   const wordOfTheDay = wordController.getWordOfTheDay()
-  const body = { guess: wordOfTheDay };
-  const response = await request(app).post('/').send(body)
+  const body = { guess: wordOfTheDay }
+  const response = await request(app).post('/isWordOfTheDay').send(body)
   expect(response.statusCode).toBe(200)
   expect(response.body).toBe('word of the day')
+})
+
+describe('When making a request to /wordIsValid', () => {
+
+  it('Tests if a valid word sent to /wordIsValid returns true', async () => {
+    const validWord = validWords[8]
+    const body = { guess: validWord }
+    const response = await request(app).post('/wordIsValid').send(body)
+    expect(response.statusCode).toBe(200)
+    expect(response.body).toBe(true)
+
+  })
+
+  it('Tests if an invalid word sent to /wordIsValid returns false', async () => {
+    const body = { guess: 'zz' }
+    const response = await request(app).post('/wordIsValid').send(body)
+    expect(response.statusCode).toBe(200)
+    expect(response.body).toBe(false)
+
+  })
+
 })
 
 test('Tests whether a new index is generated per day', () => {
