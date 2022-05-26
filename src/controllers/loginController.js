@@ -78,18 +78,18 @@ const signup = async (req, res) => {
   })
   const { error } = schema.validate(req.body)
   if (error) {
-    res.status(400).send(error.details[0].message)
+    res.status(422).send(error.details[0].message)
     return
   }
   if (req.body.password !== req.body.confirmPassword) {
-    res.status(400).send('Passwords do not match')
+    res.status(422).send('Passwords do not match')
     return
   }
 
   // check email not already used
   const existingUser = users?.find(user => user.email === req.body.email)
   if (existingUser) {
-    res.status(200).send('Email already used')
+    res.status(409).send('Email already used')
     return
   }
 
@@ -102,13 +102,13 @@ const signup = async (req, res) => {
       password: hashedPassword
     })
     console.log(users)
-    res.redirect('/')
+    res.status(200).send('Account created successfully')
   } catch {
-    res.redirect('/signup')
+    res.status(500).send('Something went wrong')
   }
-
-  // req.status(200).send('Account created successfully')
 }
+
+const getUsers = () => users
 
 // function login (username, password, validLogins) {
 //   let found = false
@@ -152,3 +152,5 @@ const signup = async (req, res) => {
 
 module.exports.login = login
 module.exports.signup = signup
+// temporary export for unit testing. To be removed when persistant storage is used
+module.exports.getUsers = getUsers
