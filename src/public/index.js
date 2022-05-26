@@ -68,7 +68,7 @@ function getCurrentPosition (previousRow, previousTile) {
   return { previousRow, previousTile }
 }
 
-function addLetter(letter) {
+function addLetter (letter) {
   const previousRow = currentRow
   const previousTile = currentTile
   // to ensure we only enter 5 letters in one row
@@ -88,8 +88,7 @@ function addLetter(letter) {
   }
 }
 
-function removeLetter() {
-
+function removeLetter () {
   if (currentTile > 0) {
     currentTile--
     const tile = document.getElementById('boardRow-' + currentRow + '-tile-' + currentTile)
@@ -98,8 +97,7 @@ function removeLetter() {
   }
 }
 
-
-async function wordIsValid(guess) {
+async function wordIsValid (guess) {
   const options = {
     method: 'POST',
 
@@ -135,23 +133,21 @@ const requestFeedback = async () => {
   return colours
 }
 
-
-function revealFeedback(colours) {
+function revealFeedback (colours) {
   const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes
   currentTiles.forEach((tile, index) => {
     setTimeout(() => {
       tile.classList.add('flip') // (causes flip animation)
       tile.classList.add(colours[index])// asign each tile to the approriate colour class to change its colour
-      //colour the keyboard
-      let key = document.getElementById(tile.getAttribute('data'))// asign each key to the approriate colour class.
+      // colour the keyboard
+      const key = document.getElementById(tile.getAttribute('data'))// asign each key to the approriate colour class.
       // The colour matches the tile's colour
       key.classList.add(colours[index])
     }, 300 * index)// ensure they dont all flip and change colour  at the same time, Higher indexes executed after more time
   })
 }
 
-
-function checkCurrentRow() {
+function checkCurrentRow () {
   if (currentTile > 4) {
     const currentGuess = boardArray[currentRow].join('').toLowerCase()
     const guess = { guess: currentGuess }
@@ -176,7 +172,6 @@ function checkCurrentRow() {
             if (wordOfTheDay === 'word of the day') {
               feedbackForGuess('Correct')
               isGameEnded = true
-
             } else {
               if (currentRow === 5) {
                 feedbackForGuess('Try again tomorrow')
@@ -193,7 +188,6 @@ function checkCurrentRow() {
           })
       }
     })
-
   }
 }
 const handleClick = (letter) => {
@@ -210,7 +204,7 @@ const handleClick = (letter) => {
     addLetter(letter)
   }
 }
-function generateKeyboard() {
+function generateKeyboard () {
   keys.forEach((key) => {
     const buttonTag = document.createElement('button')
     buttonTag.textContent = key
@@ -221,13 +215,13 @@ function generateKeyboard() {
   })
 }
 
-function activatePhysicalKeyBoard() {
+function activatePhysicalKeyBoard () {
   document.addEventListener('keydown', (event) => {
     const letter = event.key
     if (letter === 'Backspace' || letter === 'Enter') { handleClick(letter) } else if (letter.length === 1) { handleClick(letter.toUpperCase()) }
   })
 }
-function feedbackForGuess(feedback) {
+function feedbackForGuess (feedback) {
   const feedbackElement = document.createElement('p')
   feedbackElement.textContent = feedback
   messageContainer.append(feedbackElement)
