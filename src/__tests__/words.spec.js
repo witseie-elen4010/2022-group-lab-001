@@ -40,6 +40,14 @@ describe('When making a request to /wordIsValid', () => {
 
   })
 
+  it('Tests if an invalid word sent to /wordIsValid returns false', async () => {
+    const body = { guess: 'zz' }
+    const response = await request(app).post('/wordIsValid').send(body)
+    expect(response.statusCode).toBe(200)
+    expect(response.body).toBe(false)
+
+  })
+
 })
 
 test('Tests whether a new index is generated per day', () => {

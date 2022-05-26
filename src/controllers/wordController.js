@@ -26,8 +26,8 @@ const isWordOfTheDay = (request, response) => {
 };
 
 const wordIsValid = (request, response) => {
-  const x = request.body.guess
-  response.json(validWords.includes(x))
+  const currentGuess = request.body.guess
+  response.json(validWords.includes(currentGuess))
 }
 
 module.exports = {
