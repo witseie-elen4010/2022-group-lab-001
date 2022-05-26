@@ -25,13 +25,3 @@ describe('Check row function', () => {
   })
 })
 
-/*
-
-describe('Testing colour assignment', function () {
-  test('the word of the day is train, it should return grey,green,green,green which corresponds to the class used in css to change its appearance', () => {
-    const guess = 'brain'
-    expect(wordController.assignColours(guess)).toEqual(['grey-overlay', 'green-overlay', 'green-overlay', 'green-overlay', 'green-overlay'])
-  })
-})
-
-*/

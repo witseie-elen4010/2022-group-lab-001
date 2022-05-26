@@ -1,15 +1,18 @@
 'use strict'
 
+// const { get } = require('../routes/wordRoutes')
+
 const assignColours = (request, response) => {
   const wordOfTheDay = 'train'// needs to be obtained
+ 
   const guessedWord = request.body.guessJson
-  // guess.forEach(letter => { console.log(letter) })
   const colours = []
+  console.log(guessedWord)
   // the order of colour assignment matters, please dont change it
-  let checkWordle = wordOfTheDay
-  guessedWord.forEach((letter, index) => { // first assign them all grey
-    colours[index] = 'grey-block'
-  })
+   let checkWordle = getWordOfTheDay()
+   guessedWord.forEach((letter, index) => { // first assign them all grey
+     colours[index] = 'grey-block'
+   })
 
   guessedWord.forEach((letter, index) => {
     if (letter === wordOfTheDay[index]) {
@@ -30,8 +33,14 @@ const assignColours = (request, response) => {
   // guess.forEach(letter => { console.log(letter) })
   // console.log('one', colours)
   response.json(colours)
+  // response.json('hello world')
+}
+const getWordOfTheDay = () => {
+  return 'train'
+
 }
 
 module.exports = {
-  assignColours
+  assignColours,
+  getWordOfTheDay
 }
