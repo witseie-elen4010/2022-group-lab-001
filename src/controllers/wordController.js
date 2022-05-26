@@ -1,6 +1,40 @@
-"use strict";
-const dictionary = require("../models/dictionary");
+'use strict'
+
+const dictionary = require('../models/dictionary');
 const validWords = dictionary.getDictionary();
+
+const assignColours = (request, response) => {
+  // const wordOfTheDay = 'train'// needs to be obtained
+  const wordOfTheDay = getWordOfTheDay().toUpperCase()
+
+  const guessedWord = request.body.guessJson
+
+  const colours = []
+  console.log(guessedWord)
+  // the order of colour assignment matters, please dont change it
+  let checkWordle = getWordOfTheDay().toUpperCase()
+  guessedWord.forEach((letter, index) => { // first assign them all grey
+    colours[index] = 'grey-block'
+  })
+
+  guessedWord.forEach((letter, index) => {
+    if (letter === wordOfTheDay[index]) {
+      colours[index] = 'green-block'
+      checkWordle = checkWordle.replace(letter, '')// ensures we dont undo our work by removing it now its been dealth with
+    }
+  })
+
+  guessedWord.forEach((letter, index) => {
+    if (checkWordle.includes(letter)) {
+      colours[index] = 'blue-block'
+      checkWordle = checkWordle.replace(letter, '')// esnures we wont check letters that have already been dealt with
+    }
+  })
+
+  response.json(colours)
+
+}
+
 
 const getRandomIndexBasedOnDate = (date) => {
   return (
@@ -9,13 +43,31 @@ const getRandomIndexBasedOnDate = (date) => {
   );
 };
 
-const getWordOfTheDay = (req, res) => {
+const getWordOfTheDay = () => {
   const date = new Date();
   const index = getRandomIndexBasedOnDate(date);
-  res.json(validWords[index]);
+  return validWords[index];
 };
+
+const isWordOfTheDay = (request, response) => {
+  const wordOfTheDay = getWordOfTheDay();
+  if (request.body.guess === wordOfTheDay) {
+    response.json('word of the day')
+  } else {
+    response.json('not word of day')
+  }
+};
+
+const wordIsValid = (request, response) => {
+  const currentGuess = request.body.guess
+  response.json(validWords.includes(currentGuess))
+}
 
 module.exports = {
   getWordOfTheDay,
   getRandomIndexBasedOnDate,
+  wordIsValid,
+  isWordOfTheDay,
+  assignColours
+
 };
