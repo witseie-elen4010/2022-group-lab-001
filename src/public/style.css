@@ -115,8 +115,22 @@ body {
     width: 350px;
     margin-bottom: 40px;
 }
+.tileContainer1 {
+    width: 40%;
+    margin-bottom: 40px;
+float:left}
+.tileContainer2 {
+    width: 40%;
+    margin-bottom: 40px;
 
+float:right}
 .tileContainer div {
+    display: flex;
+}
+.tileContainer1 div {
+    display: flex;
+}
+.tileContainer2 div {
     display: flex;
 }
 
@@ -129,6 +143,25 @@ body {
     justify-content: center;
     align-items: center;
     margin: 2px;
+}
+
+.tileContainer1 .tile {
+    width: 40px;
+    height: 40px;
+    border: 1px solid#3a3a3c;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.tileContainer2 .tile {
+    width: 40px;
+    height: 40px;
+    border: 1px solid#3a3a3c;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 

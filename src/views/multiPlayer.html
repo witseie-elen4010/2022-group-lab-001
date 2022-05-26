@@ -5,25 +5,47 @@
     <title>MULTIWORDLE</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="/cdn/style.css" />
-    <script src="/cdn/scripts/class/index.js"></script>
+    <script defer src="/cdn/scripts/multiPlayerStart.js"></script>
+    
+
 
 </head>
 
 <body>
+    <div class="game">
 
-    <div class='game'>
-        <div class='title'>
-            <h1> MULTIPLAYER</h1>
+        <div class="title">
+            <h1>MULTIWORDLE MULTIPLAYER</h1>
+        </div>
+        <br>
+        <br>
+        <br>
+        <br>
+        
+            <h3>
+                Select the number of players you want to play with (including you)
+            </h3>
+            <input type="radio" name="players" value="multi2"> 2 Players<br>
+            <input type="radio" name="players" value="multi3"> 3 Players<br>
+            <input type="radio" name="players" value="multi4"> 4 Players<br>
+            <button id="generateCode" class="Button">Generate Code to send to your friends</button>
+            <br>
 
-            <h2>Coming Soon!</h2>
-        </div>
-        <div class='board'>
-        </div>
-        <div class='keyboard'>
-        </div>
-        <div class='message'>
+            <div class = 'code-entering'>
+            <h4>
+                And/Or Enter a code
+            </h4>
+            <input type="text" id="code" name="code">
+            <br>
+<h4>
+    When you are ready to begin, click 'Start Game'
+</h4>
+        <form action="multi2" method="get">
+            <button type="submit" id="startGame" class="Button">Start Game</button>
+        </form>
         </div>
     </div>
-</body>
 
+</body>
+<script src="/cdn/index.js" ></script>
 </html>

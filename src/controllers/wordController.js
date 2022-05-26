@@ -1,16 +1,21 @@
 'use strict'
 
+const dictionary = require('../models/dictionary');
+const validWords = dictionary.getDictionary();
+
 const assignColours = (request, response) => {
-  const wordOfTheDay = 'train'// needs to be obtained
- 
+  // const wordOfTheDay = 'train'// needs to be obtained
+  const wordOfTheDay = getWordOfTheDay().toUpperCase()
+
   const guessedWord = request.body.guessJson
+
   const colours = []
   console.log(guessedWord)
   // the order of colour assignment matters, please dont change it
-   let checkWordle = getWordOfTheDay()
-   guessedWord.forEach((letter, index) => { // first assign them all grey
-     colours[index] = 'grey-block'
-   })
+  let checkWordle = getWordOfTheDay().toUpperCase()
+  guessedWord.forEach((letter, index) => { // first assign them all grey
+    colours[index] = 'grey-block'
+  })
 
   guessedWord.forEach((letter, index) => {
     if (letter === wordOfTheDay[index]) {
@@ -29,12 +34,40 @@ const assignColours = (request, response) => {
   response.json(colours)
 
 }
-const getWordOfTheDay = () => {
-  return 'train'
 
+
+const getRandomIndexBasedOnDate = (date) => {
+  return (
+    (date.getFullYear() * date.getDate() * (date.getMonth() + 1)) %
+    validWords.length
+  );
+};
+
+const getWordOfTheDay = () => {
+  const date = new Date();
+  const index = getRandomIndexBasedOnDate(date);
+  return validWords[index];
+};
+
+const isWordOfTheDay = (request, response) => {
+  const wordOfTheDay = getWordOfTheDay();
+  if (request.body.guess === wordOfTheDay) {
+    response.json('word of the day')
+  } else {
+    response.json('not word of day')
+  }
+};
+
+const wordIsValid = (request, response) => {
+  const currentGuess = request.body.guess
+  response.json(validWords.includes(currentGuess))
 }
 
 module.exports = {
-  assignColours,
-  getWordOfTheDay
-}
+  getWordOfTheDay,
+  getRandomIndexBasedOnDate,
+  wordIsValid,
+  isWordOfTheDay,
+  assignColours
+
+};

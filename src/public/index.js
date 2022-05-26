@@ -1,8 +1,8 @@
 'use strict'
 
-const wordOfTheDay = 'train'
 const messageContainer = document.querySelector('.messageContainer')
 const keyboard = document.querySelector('.keyContainer')
+let isGameEnded = false
 
 // private
 const tileDisplay = document.querySelector('.tileContainer')
@@ -47,9 +47,7 @@ const keys = [
   'Backspace'
 ]
 
-// public
-
-function generateBoard () {
+function generateBoard() {
   // Loop through each row and each tile to create the board
   boardArray.forEach((boardRow, boardRowIndex) => {
     const rowElement = document.createElement('div')
@@ -66,13 +64,13 @@ function generateBoard () {
     tileDisplay.append(rowElement)
   })
 }
-function getCurrentPosition (previousRow, previousTile) {
+function getCurrentPosition(previousRow, previousTile) {
   // for future functionality this must deal with the logic for deleting and element and for moving to the next row
   previousTile++
   return { previousRow, previousTile }
 }
 
-function addLetter (letter) {
+function addLetter(letter) {
   const previousRow = currentRow
   const previousTile = currentTile
   // to ensure we only enter 5 letters in one row
@@ -91,7 +89,8 @@ function addLetter (letter) {
   }
 }
 
-function removeLetter () {
+function removeLetter() {
+
   if (currentTile > 0) {
     currentTile--
     const tile = document.getElementById('boardRow-' + currentRow + '-tile-' + currentTile)
@@ -99,23 +98,24 @@ function removeLetter () {
     boardArray[currentRow][currentTile] = ''
   }
 }
-const checkCurrentRow = (
-  rowsOfGuesses,
-  currentRow,
-  currentElement,
-  wordOfTheDay
-) => {
-  console.log(currentElement)
-  if (currentElement === 5) {
-    const currentGuess = rowsOfGuesses[currentRow].join('').toLowerCase()
-    if (currentGuess === wordOfTheDay) {
-      messageContainer.textContent = 'Correct'
-    }
+
+async function wordIsValid(guess) {
+  const options = {
+    method: 'POST',
+
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(guess)
   }
+  const response = await fetch('/word/wordIsValid', options)
+  const isValid = await response.json()
+
+  return isValid
 }
 
 const requestFeedback = async () => {
-  const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes 
+  const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes
   const guessedWord = []
   currentTiles.forEach(tile => {
     guessedWord.push(tile.getAttribute('data'))
@@ -129,14 +129,14 @@ const requestFeedback = async () => {
     },
     body: JSON.stringify(guessJson)
   }
- 
-const response = await fetch('/word/getColours', options)
-const colours = await response.json()
-return colours
+
+  const response = await fetch('/word/getColours', options)
+  const colours = await response.json()
+  return colours
 }
 
 
-function revealFeedback (colours) {
+function revealFeedback(colours) {
   const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes
   currentTiles.forEach((tile, index) => {
     setTimeout(() => {
@@ -146,19 +146,79 @@ function revealFeedback (colours) {
   })
 }
 
-const handleClick = (letter) => {
-  if (letter === 'Backspace') {
-    removeLetter()
-    return
+// const handleClick = (letter) => {
+//   if (letter === 'Backspace') {
+//     removeLetter()
+//     return
+//   }
+//   if (letter === 'Enter') {
+//     checkCurrentRow(boardArray, currentRow, currentTile, wordOfTheDay)
+//     requestFeedback().then((colours) => revealFeedback(colours))
+//     return
+//   }
+// }
+// HandleEnter()
+function checkCurrentRow() {
+  if (currentTile > 4) {
+    const currentGuess = boardArray[currentRow].join('').toLowerCase()
+    const guess = { guess: currentGuess }
+    wordIsValid(guess).then(isValid => {
+      if (!isValid) {
+        feedbackForGuess('Invalid Word')
+        // delete letters in the row
+      } else {
+        requestFeedback().then((colours) => revealFeedback(colours))
+        const options = {
+          method: 'POST',
+
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(guess)
+        }
+        fetch('/word/isWordOfTheDay', options)
+          .then((res) => res.json())
+          .then((wordOfTheDay) => {
+            console.log(wordOfTheDay)
+            if (wordOfTheDay === 'word of the day') {
+              feedbackForGuess('Correct')
+              isGameEnded = true
+
+            } else {
+              if (currentRow === 5) {
+                feedbackForGuess('Try again tomorrow')
+                isGameEnded = true
+                return
+              }
+
+              if (currentRow < 5) {
+                feedbackForGuess('Try again')
+                currentRow = currentRow + 1
+                currentTile = 0
+              }
+            }
+          })
+      }
+    })
+
+    // }).catch(err => console.log(err))
   }
-  if (letter === 'Enter') {
-    checkCurrentRow(boardArray, currentRow, currentTile, wordOfTheDay)
-     requestFeedback().then((colours) => revealFeedback(colours))
-    return
-  }
-  addLetter(letter)
 }
-function generateKeyboard () {
+const handleClick = (letter) => {
+  if (isGameEnded === false) {
+    if (letter === 'Backspace') {
+      removeLetter()
+      return
+    }
+    if (letter === 'Enter') {
+      checkCurrentRow()
+
+      return
+    }
+    addLetter(letter)
+  }
+}
+function generateKeyboard() {
   keys.forEach((key) => {
     const buttonTag = document.createElement('button')
     buttonTag.textContent = key
@@ -168,14 +228,18 @@ function generateKeyboard () {
     keyboard.append(buttonTag)
   })
 }
-function activatePhysicalKeyBoard () {
+function activatePhysicalKeyBoard() {
   document.addEventListener('keydown', (event) => {
     const letter = event.key
-    handleClick(letter)
-    console.log('this is back', event)
+    if (letter === 'Backspace' || letter === 'Enter') { handleClick(letter) } else if (letter.length === 1) { handleClick(letter.toUpperCase()) }
   })
 }
-
+function feedbackForGuess(feedback) {
+  const feedbackElement = document.createElement('p')
+  feedbackElement.textContent = feedback
+  messageContainer.append(feedbackElement)
+  setTimeout(() => messageContainer.removeChild(feedbackElement), 1000)
+}
 generateBoard()
 activatePhysicalKeyBoard()
 generateKeyboard()
