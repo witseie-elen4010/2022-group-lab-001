@@ -142,22 +142,15 @@ function revealFeedback(colours) {
     setTimeout(() => {
       tile.classList.add('flip') // (causes flip animation)
       tile.classList.add(colours[index])// asign each tile to the approriate colour class to change its colour
+      //colour the keyboard
+      let key = document.getElementById(tile.getAttribute('data'))// asign each key to the approriate colour class.
+      // The colour matches the tile's colour
+      key.classList.add(colours[index])
     }, 300 * index)// ensure they dont all flip and change colour  at the same time, Higher indexes executed after more time
   })
 }
 
-// const handleClick = (letter) => {
-//   if (letter === 'Backspace') {
-//     removeLetter()
-//     return
-//   }
-//   if (letter === 'Enter') {
-//     checkCurrentRow(boardArray, currentRow, currentTile, wordOfTheDay)
-//     requestFeedback().then((colours) => revealFeedback(colours))
-//     return
-//   }
-// }
-// HandleEnter()
+
 function checkCurrentRow() {
   if (currentTile > 4) {
     const currentGuess = boardArray[currentRow].join('').toLowerCase()
@@ -201,7 +194,6 @@ function checkCurrentRow() {
       }
     })
 
-    // }).catch(err => console.log(err))
   }
 }
 const handleClick = (letter) => {
