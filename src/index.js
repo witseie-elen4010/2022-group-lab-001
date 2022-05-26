@@ -5,7 +5,7 @@ const app = express()
 const bodyParser = require('body-parser')
 const mainRouter = require('./mainRoutes.js')
 const gameRouter = require('./gameRoutes.js')
-const loginController = require('./controllers/loginController')
+const loginController = require('./routes/loginRoutes')
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))

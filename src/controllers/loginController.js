@@ -1,16 +1,11 @@
 'use strict'
 
 const Joi = require('joi')
-const express = require('express')
 const bcrypt = require('bcrypt')
 // const passport = require('passport')
 // const initialisePassport = require('./passport-config')
 // const flash = require('express-flash')
 // const session = require('express-session')
-
-const router = express.Router()
-
-router.use(express.urlencoded({ extended: false }))
 
 const users = []
 
@@ -19,7 +14,7 @@ const users = []
 //   email => logins.find(user => user.email === email)
 // )
 
-const loginFn = async (req, res) => {
+const login = async (req, res) => {
   try {
     // validation
     const schema = Joi.object({
@@ -53,7 +48,6 @@ const loginFn = async (req, res) => {
   }
 }
 
-router.post('/login', loginFn)
 // (req, res) => {
 //   // validation
 //   const schema = Joi.object({
@@ -75,7 +69,7 @@ router.post('/login', loginFn)
 //   res.status(200).send('Login successful')
 // })
 
-router.post('/signup', async (req, res) => {
+const signup = async (req, res) => {
   // validation
   const schema = Joi.object({
     email: Joi.string().email().required(),
@@ -114,7 +108,7 @@ router.post('/signup', async (req, res) => {
   }
 
   // req.status(200).send('Account created successfully')
-})
+}
 
 // function login (username, password, validLogins) {
 //   let found = false
@@ -156,6 +150,5 @@ router.post('/signup', async (req, res) => {
 //   return true
 // }
 
-// module.exports.login = login
-// module.exports.signup = signup
-module.exports = router
+module.exports.login = login
+module.exports.signup = signup
