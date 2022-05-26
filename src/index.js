@@ -11,6 +11,8 @@ const gameRouter = require('./gameRoutes.js')
 const loginController = require('./routes/loginRoutes')
 
 const wordRouter = require('./routes/wordRoutes')
+
+
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 // app.use(express.json({ limit: '1mb' }))
@@ -20,7 +22,6 @@ app.use('/cdn', express.static('public'))
 app.use('/views', gameRouter)
 app.use('/loginapi', loginController)
 app.use('/word', wordRouter, express.static('public'), express.json({ limit: '1mb' }))
-
 // module.exports(app)
 app.engine('html', require('ejs').renderFile)
 app.set('view engine', 'html')
