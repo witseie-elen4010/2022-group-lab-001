@@ -36,8 +36,7 @@
 
     <!-- This screen appears when a user clicks "CREATE" on the Title Screen -->
     <script id="create-game-template" type="text/template">
-        <div class="createGameWrapper">
-
+        <div style= 'text-align:center' class="createGameWrapper">
             <div class="info"> Game ID:</div>
             <div id="spanNewGameCode" class="gameId"></div>
 
@@ -46,22 +45,18 @@
     </script>
 
     <!-- This screen appears when a player clicks "JOIN" on the Title Screen -->
+    <button id="btnStart" style= 'display: none;' class = 'Button'>START</button>
     <script id="join-game-template" type="text/template">
-        <div class="joinGameWrapper">
+        <div style= 'text-align:center' class="joinGameWrapper">
             <div class="info">
-                <label for="inputPlayerName">Your Name:</label>
-                <input id="inputPlayerName" type="text" />
+                <input id="inputPlayerName" type="text" placeholder = 'your name' />
             </div>
 
             <div class="info">
-                <label for="inputGameId">Game ID:</label>
-                <input id="inputGameId" type="text"/>
+                <input id="inputGameId" type="text" placeholder = 'Game ID' />
             </div>
-
-            <div class="info buttons">
-                <button id="btnStart" class="btn">Start</button>
                 <div id="playerWaitingMessage"></div>
-            </div>
+           
         </div>
     </script>
 
@@ -86,7 +81,6 @@
     </script>
 
 <script src="/socket.io/socket.io.js"></script>
-<script src="/cdn/libs/jquery-2.0.2.min.js"></script>
 <script type="module" src="/cdn/playMulti.js"></script>
 </body>
 
