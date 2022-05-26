@@ -4,6 +4,21 @@ const wordOfTheDay = 'train'
 const messageContainer = document.querySelector('.messageContainer')
 const keyboard = document.querySelector('.keyContainer')
 
+const checkCurrentRow = (
+  rowsOfGuesses,
+  currentRow,
+  currentElement,
+  wordOfTheDay
+) => {
+  console.log(currentElement)
+  if (currentElement === 5) {
+    const currentGuess = rowsOfGuesses[currentRow].join('').toLowerCase()
+    if (currentGuess === wordOfTheDay) {
+      messageContainer.textContent = 'Correct'
+    }
+  }
+}
+
 // private
 const tileDisplay = document.querySelector('.tileContainer')
 const boardArray = [
@@ -96,20 +111,6 @@ function removeLetter () {
     const tile = document.getElementById('boardRow-' + currentRow + '-tile-' + currentTile)
     tile.textContent = ''
     boardArray[currentRow][currentTile] = ''
-  }
-}
-const checkCurrentRow = (
-  rowsOfGuesses,
-  currentRow,
-  currentElement,
-  wordOfTheDay
-) => {
-  console.log(currentElement)
-  if (currentElement === 5) {
-    const currentGuess = rowsOfGuesses[currentRow].join('').toLowerCase()
-    if (currentGuess === wordOfTheDay) {
-      messageContainer.textContent = 'Correct'
-    }
   }
 }
 
