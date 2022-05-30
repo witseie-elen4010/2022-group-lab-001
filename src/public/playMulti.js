@@ -137,6 +137,7 @@ const App = {
 
     // for multiple players
     updateWaitingScreen: function (data) {
+      document.getElementById('btnStart').style.display = 'none'
       // If this is a restarted game, show the screen.
       App.gameArea.innerHTML = App.waitingScreen
       if (App.Host.isNewGame) {
@@ -385,6 +386,7 @@ const App = {
         if (currentTile > 4) {
           const currentGuess = boardArray[currentRow].join('').toLowerCase()
           const guess = { guess: currentGuess, chosen: chosenWord }
+          console.log('guess = ' + guess.guess + ' chosen = ' + guess.chosen)
           wordIsValid(guess).then(isValid => {
             if (!isValid) {
               feedbackForGuess('Invalid Word')
@@ -399,20 +401,20 @@ const App = {
                 },
                 body: JSON.stringify(guess)
               }
-              const hostWord = chosenWord
+              // const hostWord = chosenWord
 
               fetch('/word/isWordOfTheDay', options)
                 .then((res) => res.json())
                 .then((wordOfTheDay) => {
                   console.log(wordOfTheDay)
-                  if ((wordOfTheDay === 'word of the day' && hostWord.length !== 5) || guess === hostWord) {
+                  if (wordOfTheDay === 'word of the day') {
                     const data = {
                       myRole: App.myRole,
                       gameId: App.gameId
                     }
-                    IO.socket.emit('gameWinner', data)
                     feedbackForGuess('Correct')
                     isGameEnded = true
+                    IO.socket.emit('gameWinner', data)
                   } else {
                     if (currentRow === 5) {
                       feedbackForGuess('Try again tomorrow')
@@ -502,6 +504,8 @@ const App = {
     },
 
     updateWaitingScreen: function (data) {
+      document.getElementById('btnStart').style.display = 'none'
+
       App.gameArea.innerHTML = App.waitingScreen
       if (IO.socket.id === data.mySocketId) {
         App.myRole = 'Player'

@@ -54,7 +54,7 @@ const isWordOfTheDay = (request, response) => {
   if (request.body.chosen.length !== 0) {
     wordOfTheDay = request.body.chosen.toUpperCase()
   }
-  if (request.body.guess === wordOfTheDay) {
+  if (request.body.guess === wordOfTheDay || request.body.guess.toUpperCase() === wordOfTheDay) {
     response.json('word of the day')
   } else {
     response.json('not word of day')
