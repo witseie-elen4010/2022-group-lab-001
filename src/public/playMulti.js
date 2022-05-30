@@ -129,8 +129,6 @@ const App = {
     },
 
     displayNewGameScreen: function () {
-      // Fill the game screen with the appropriate HTML
-      // Show the gameId / room id on screen
       App.gameArea.innerHTML = App.templateNewGame
       document.getElementById('spanNewGameCode').innerText = App.gameId
     },
@@ -179,43 +177,8 @@ const App = {
     },
 
     displayGame: function () {
-      // Prepare the game screen with new HTML
       App.gameArea.innerHTML = App.hostGame
       IO.socket.emit('tellHostGameStarting', App.gameId)
-      // let isGameEnded = false
-
-      /* let wordOfTheDay = 'train'
-      const hostWord = chosenWord
-      if (hostWord.length === 5) {
-        wordOfTheDay = hostWord
-      }
-      */
-      // const messageContainer = document.querySelector('.messageContainer')
-      // const isGameEnded = false
-
-      /* const checkCurrentRow = (
-        rowsOfGuesses,
-        currentRow,
-        currentElement,
-        wordOfTheDay
-      ) => {
-        console.log(currentElement)
-        if (currentElement === 5) {
-          const currentGuess = rowsOfGuesses[currentRow].join('').toLowerCase()
-          if (currentGuess === wordOfTheDay) {
-            messageContainer.textContent = 'COORECCCTTTT'
-            const data = {
-              myRole: App.myRole,
-              gameId: App.gameId
-            }
-            IO.socket.emit('gameWinner', data)
-          }
-        }
-      }
-      */
-      // private
-      // const tileDisplay1 = document.querySelector('.tileContainer1')
-      // const tileDisplay2 = document.querySelector('.tileContainer2')
 
       const messageContainer = document.querySelector('.messageContainer')
       const keyboard = document.querySelector('.keyContainer')
