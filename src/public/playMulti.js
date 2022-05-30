@@ -181,15 +181,18 @@ const App = {
       // Prepare the game screen with new HTML
       App.gameArea.innerHTML = App.hostGame
       IO.socket.emit('tellHostGameStarting', App.gameId)
+      // let isGameEnded = false
 
-      let wordOfTheDay = 'train'
+      /* let wordOfTheDay = 'train'
       const hostWord = chosenWord
       if (hostWord.length === 5) {
         wordOfTheDay = hostWord
       }
-      const messageContainer = document.querySelector('.messageContainer')
+      */
+      // const messageContainer = document.querySelector('.messageContainer')
+      // const isGameEnded = false
 
-      const checkCurrentRow = (
+      /* const checkCurrentRow = (
         rowsOfGuesses,
         currentRow,
         currentElement,
@@ -208,10 +211,16 @@ const App = {
           }
         }
       }
+      */
       // private
+      // const tileDisplay1 = document.querySelector('.tileContainer1')
+      // const tileDisplay2 = document.querySelector('.tileContainer2')
+
+      const messageContainer = document.querySelector('.messageContainer')
+      const keyboard = document.querySelector('.keyContainer')
+      let isGameEnded = false
       const tileDisplay = document.querySelector('.tileContainer1')
       const tileDisplay2 = document.querySelector('.tileContainer2')
-
       const boardArray = [
         ['', '', '', '', ''],
         ['', '', '', '', ''],
@@ -222,8 +231,36 @@ const App = {
       ]
       let currentRow = 0
       let currentTile = 0
-
-      // public
+      const keys = [
+        'Q',
+        'W',
+        'E',
+        'R',
+        'T',
+        'Y',
+        'U',
+        'I',
+        'O',
+        'P',
+        'A',
+        'S',
+        'D',
+        'F',
+        'G',
+        'H',
+        'J',
+        'K',
+        'L',
+        'Enter',
+        'Z',
+        'X',
+        'C',
+        'V',
+        'B',
+        'N',
+        'M',
+        'Backspace'
+      ]
 
       function generateBoard () {
         // Loop through each row and each tile to create the board
@@ -242,7 +279,6 @@ const App = {
           tileDisplay.append(rowElement)
         })
       }
-
       function generateBoard2 () {
         // Loop through each row and each tile to create the board
         boardArray.forEach((boardRow, boardRowIndex) => {
@@ -277,6 +313,8 @@ const App = {
           tile.textContent = letter
           boardArray[currentRow][currentTile] = letter
           console.log('boardRow', boardArray)
+
+          tile.setAttribute('data', letter)
           const position = getCurrentPosition(previousRow, previousTile)
 
           currentRow = position.previousRow
@@ -293,60 +331,118 @@ const App = {
         }
       }
 
-      generateBoard()
-      generateBoard2()
+      async function wordIsValid (guess) {
+        const options = {
+          method: 'POST',
 
-      // function physicalKeyBoard () {
-      // letter input from keyboard, later should be updated to work with on screen keyboard-just used to visually check its working
-      document.addEventListener('keypress', (event) => {
-        const letter = event.key
-        console.log(event.code)
-        addLetter(letter)
-      })
-      // }
-      // physicalKeyBoard()
-      const keyboard = document.querySelector('.keyContainer')
-
-      const keys = [
-        'Q',
-        'W',
-        'E',
-        'R',
-        'T',
-        'Y',
-        'U',
-        'I',
-        'O',
-        'P',
-        'A',
-        'S',
-        'D',
-        'F',
-        'G',
-        'H',
-        'J',
-        'K',
-        'L',
-        'Enter',
-        'Z',
-        'X',
-        'C',
-        'V',
-        'B',
-        'N',
-        'M',
-        'Backspace'
-      ]
-
-      const handleClick = (letter) => {
-        if (letter === 'Backspace') {
-          removeLetter()
-          return
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(guess)
         }
-        addLetter(letter)
-        if (letter === 'Enter') {
-          console.log(letter)
-          checkCurrentRow(boardArray, currentRow, currentTile, wordOfTheDay)
+        const response = await fetch('/word/wordIsValid', options)
+        const isValid = await response.json()
+
+        return isValid
+      }
+
+      const requestFeedback = async () => {
+        const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes
+        const guessedWord = []
+        currentTiles.forEach(tile => {
+          guessedWord.push(tile.getAttribute('data'))
+        })
+        const guessJson = { guessJson: guessedWord, chosen: chosenWord }
+        const options = {
+          method: 'POST',
+
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(guessJson)
+        }
+
+        const response = await fetch('/word/getColours', options)
+        const colours = await response.json()
+        return colours
+      }
+
+      function revealFeedback (colours) {
+        const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes
+        currentTiles.forEach((tile, index) => {
+          setTimeout(() => {
+            tile.classList.add('flip') // (causes flip animation)
+            tile.classList.add(colours[index])// asign each tile to the approriate colour class to change its colour
+            // colour the keyboard
+            const key = document.getElementById(tile.getAttribute('data'))// asign each key to the approriate colour class.
+            // The colour matches the tile's colour
+            key.classList.add(colours[index])
+          }, 300 * index)// ensure they dont all flip and change colour  at the same time, Higher indexes executed after more time
+        })
+      }
+
+      function checkCurrentRow () {
+        if (currentTile > 4) {
+          const currentGuess = boardArray[currentRow].join('').toLowerCase()
+          const guess = { guess: currentGuess, chosen: chosenWord }
+          wordIsValid(guess).then(isValid => {
+            if (!isValid) {
+              feedbackForGuess('Invalid Word')
+              // delete letters in the row
+            } else {
+              requestFeedback().then((colours) => revealFeedback(colours))
+              const options = {
+                method: 'POST',
+
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(guess)
+              }
+              const hostWord = chosenWord
+
+              fetch('/word/isWordOfTheDay', options)
+                .then((res) => res.json())
+                .then((wordOfTheDay) => {
+                  console.log(wordOfTheDay)
+                  if ((wordOfTheDay === 'word of the day' && hostWord.length !== 5) || guess === hostWord) {
+                    const data = {
+                      myRole: App.myRole,
+                      gameId: App.gameId
+                    }
+                    IO.socket.emit('gameWinner', data)
+                    feedbackForGuess('Correct')
+                    isGameEnded = true
+                  } else {
+                    if (currentRow === 5) {
+                      feedbackForGuess('Try again tomorrow')
+                      isGameEnded = true
+                      return
+                    }
+
+                    if (currentRow < 5) {
+                      feedbackForGuess('Try again')
+                      currentRow = currentRow + 1
+                      currentTile = 0
+                    }
+                  }
+                })
+            }
+          })
+        }
+      }
+      const handleClick = (letter) => {
+        if (isGameEnded === false) {
+          if (letter === 'Backspace') {
+            removeLetter()
+            return
+          }
+          if (letter === 'Enter') {
+            checkCurrentRow()
+
+            return
+          }
+          addLetter(letter)
         }
       }
       function generateKeyboard () {
@@ -360,6 +456,21 @@ const App = {
         })
       }
 
+      function activatePhysicalKeyBoard () {
+        document.addEventListener('keydown', (event) => {
+          const letter = event.key
+          if (letter === 'Backspace' || letter === 'Enter') { handleClick(letter) } else if (letter.length === 1) { handleClick(letter.toUpperCase()) }
+        })
+      }
+      function feedbackForGuess (feedback) {
+        const feedbackElement = document.createElement('p')
+        feedbackElement.textContent = feedback
+        messageContainer.append(feedbackElement)
+        setTimeout(() => messageContainer.removeChild(feedbackElement), 1000)
+      }
+      generateBoard()
+      generateBoard2()
+      activatePhysicalKeyBoard()
       generateKeyboard()
     }
 
@@ -411,36 +522,11 @@ const App = {
       App.gameArea.innerHTML = App.playerGame
       // IO.socket.emit('hostCountdownFinished', App.gameId)
 
-      let wordOfTheDay = 'train'
-      const hostWord = chosenWord
-      if (hostWord.length === 5) {
-        wordOfTheDay = hostWord
-      }
       const messageContainer = document.querySelector('.messageContainer')
-
-      const checkCurrentRow = (
-        rowsOfGuesses,
-        currentRow,
-        currentElement,
-        wordOfTheDay
-      ) => {
-        console.log(currentElement)
-        if (currentElement === 5) {
-          const currentGuess = rowsOfGuesses[currentRow].join('').toLowerCase()
-          if (currentGuess === wordOfTheDay) {
-            messageContainer.textContent = 'Correct  '
-            const data = {
-              myRole: App.myName,
-              gameId: App.gameId
-            }
-            IO.socket.emit('gameWinner', data)
-          }
-        }
-      }
-      // private
+      const keyboard = document.querySelector('.keyContainer')
+      let isGameEnded = false
       const tileDisplay = document.querySelector('.tileContainer1')
       const tileDisplay2 = document.querySelector('.tileContainer2')
-
       const boardArray = [
         ['', '', '', '', ''],
         ['', '', '', '', ''],
@@ -451,8 +537,36 @@ const App = {
       ]
       let currentRow = 0
       let currentTile = 0
-
-      // public
+      const keys = [
+        'Q',
+        'W',
+        'E',
+        'R',
+        'T',
+        'Y',
+        'U',
+        'I',
+        'O',
+        'P',
+        'A',
+        'S',
+        'D',
+        'F',
+        'G',
+        'H',
+        'J',
+        'K',
+        'L',
+        'Enter',
+        'Z',
+        'X',
+        'C',
+        'V',
+        'B',
+        'N',
+        'M',
+        'Backspace'
+      ]
 
       function generateBoard () {
         // Loop through each row and each tile to create the board
@@ -471,7 +585,6 @@ const App = {
           tileDisplay.append(rowElement)
         })
       }
-
       function generateBoard2 () {
         // Loop through each row and each tile to create the board
         boardArray.forEach((boardRow, boardRowIndex) => {
@@ -506,6 +619,8 @@ const App = {
           tile.textContent = letter
           boardArray[currentRow][currentTile] = letter
           console.log('boardRow', boardArray)
+
+          tile.setAttribute('data', letter)
           const position = getCurrentPosition(previousRow, previousTile)
 
           currentRow = position.previousRow
@@ -522,60 +637,117 @@ const App = {
         }
       }
 
-      generateBoard()
-      generateBoard2()
+      async function wordIsValid (guess) {
+        const options = {
+          method: 'POST',
 
-      // function physicalKeyBoard () {
-      // letter input from keyboard, later should be updated to work with on screen keyboard-just used to visually check its working
-      document.addEventListener('keypress', (event) => {
-        const letter = event.key
-        console.log(event.code)
-        addLetter(letter)
-      })
-      // }
-      // physicalKeyBoard()
-      const keyboard = document.querySelector('.keyContainer')
-
-      const keys = [
-        'Q',
-        'W',
-        'E',
-        'R',
-        'T',
-        'Y',
-        'U',
-        'I',
-        'O',
-        'P',
-        'A',
-        'S',
-        'D',
-        'F',
-        'G',
-        'H',
-        'J',
-        'K',
-        'L',
-        'Enter',
-        'Z',
-        'X',
-        'C',
-        'V',
-        'B',
-        'N',
-        'M',
-        'Backspace'
-      ]
-
-      const handleClick = (letter) => {
-        if (letter === 'Backspace') {
-          removeLetter()
-          return
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(guess)
         }
-        addLetter(letter)
-        if (letter === 'Enter') {
-          console.log(letter)
-          checkCurrentRow(boardArray, currentRow, currentTile, wordOfTheDay)
+        const response = await fetch('/word/wordIsValid', options)
+        const isValid = await response.json()
+
+        return isValid
+      }
+
+      const requestFeedback = async () => {
+        const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes
+        const guessedWord = []
+        currentTiles.forEach(tile => {
+          guessedWord.push(tile.getAttribute('data'))
+        })
+        console.log('in req feedback:' + chosenWord)
+        const guessJson = { guessJson: guessedWord, chosen: chosenWord }
+        const options = {
+          method: 'POST',
+
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(guessJson)
+        }
+
+        const response = await fetch('/word/getColours', options)
+        const colours = await response.json()
+        return colours
+      }
+
+      function revealFeedback (colours) {
+        const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes
+        currentTiles.forEach((tile, index) => {
+          setTimeout(() => {
+            tile.classList.add('flip') // (causes flip animation)
+            tile.classList.add(colours[index])// asign each tile to the approriate colour class to change its colour
+            // colour the keyboard
+            const key = document.getElementById(tile.getAttribute('data'))// asign each key to the approriate colour class.
+            // The colour matches the tile's colour
+            key.classList.add(colours[index])
+          }, 300 * index)// ensure they dont all flip and change colour  at the same time, Higher indexes executed after more time
+        })
+      }
+
+      function checkCurrentRow () {
+        if (currentTile > 4) {
+          const currentGuess = boardArray[currentRow].join('').toLowerCase()
+          const guess = { guess: currentGuess, chosen: chosenWord }
+          wordIsValid(guess).then(isValid => {
+            if (!isValid) {
+              feedbackForGuess('Invalid Word')
+              // delete letters in the row
+            } else {
+              requestFeedback().then((colours) => revealFeedback(colours))
+              const options = {
+                method: 'POST',
+
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(guess)
+              }
+
+              fetch('/word/isWordOfTheDay', options)
+                .then((res) => res.json())
+                .then((wordOfTheDay) => {
+                  console.log(wordOfTheDay)
+                  if (wordOfTheDay === 'word of the day') {
+                    const data = {
+                      myRole: App.myRole,
+                      gameId: App.gameId
+                    }
+                    IO.socket.emit('gameWinner', data)
+                    feedbackForGuess('Correct')
+                    isGameEnded = true
+                  } else {
+                    if (currentRow === 5) {
+                      feedbackForGuess('Try again tomorrow')
+                      isGameEnded = true
+                      return
+                    }
+                    if (currentRow < 5) {
+                      feedbackForGuess('Try again')
+                      currentRow = currentRow + 1
+                      currentTile = 0
+                    }
+                  }
+                })
+            }
+          })
+        }
+      }
+      const handleClick = (letter) => {
+        if (isGameEnded === false) {
+          if (letter === 'Backspace') {
+            removeLetter()
+            return
+          }
+          if (letter === 'Enter') {
+            checkCurrentRow()
+
+            return
+          }
+          addLetter(letter)
         }
       }
       function generateKeyboard () {
@@ -589,6 +761,21 @@ const App = {
         })
       }
 
+      function activatePhysicalKeyBoard () {
+        document.addEventListener('keydown', (event) => {
+          const letter = event.key
+          if (letter === 'Backspace' || letter === 'Enter') { handleClick(letter) } else if (letter.length === 1) { handleClick(letter.toUpperCase()) }
+        })
+      }
+      function feedbackForGuess (feedback) {
+        const feedbackElement = document.createElement('p')
+        feedbackElement.textContent = feedback
+        messageContainer.append(feedbackElement)
+        setTimeout(() => messageContainer.removeChild(feedbackElement), 1000)
+      }
+      generateBoard()
+      generateBoard2()
+      activatePhysicalKeyBoard()
       generateKeyboard()
     }
 
