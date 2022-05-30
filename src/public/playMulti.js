@@ -12,6 +12,7 @@ const IO = {
     IO.socket.on('gameCreated', IO.onNewGameCreated)
     IO.socket.on('playerJoinedRoom', IO.playerJoinedRoom)
     IO.socket.on('beginGame', IO.beginGame)
+    IO.socket.on('beginGame3', IO.beginGame3)
     IO.socket.on('newWordData', IO.onNewWordData)
     IO.socket.on('winner', IO.othersKnowIfYouWon)
   },
@@ -23,7 +24,6 @@ const IO = {
   },
 
   onNewGameCreated: function (data) {
-    console.log('in onNewGameCreated')
     App.Host.gameInit(data)
   },
   playerJoinedRoom: function (data) {
@@ -33,10 +33,18 @@ const IO = {
   beginGame: function (data) {
     App[App.myRole].displayGame(data)
   },
+
+  beginGame3: function (data) {
+    chosenWord = data.newWord
+    console.log('beginGame3 word:' + chosenWord)
+    if (App.myRole === 'Player') {
+      App.Player.displayGame(data)
+    }
+    if (App.myRole === 'Host') {
+      App.Host.displayGame3(data)
+    }
+  },
   onNewWordData: function (data) {
-    // Update the current round
-    // App.currentRound = data.round
-    // Change the word for the Host and Player
     App[App.myRole].newWord(data)
   },
   othersKnowIfYouWon: function (data) {
@@ -50,41 +58,51 @@ const App = {
   myRole: '', // 'Player' or 'Host'
   mySocketId: '',
   currentRound: 0,
+  players2: false,
+  players3: false,
+  hostWord: '',
 
   init: function () {
-    console.log('in init2')
     App.cacheElements()
     App.showInitScreen()
     App.bindEvents()
   },
 
   cacheElements: function () {
-    App.doc = document
     // Templates
-    App.gameArea = App.doc.getElementById('gameArea')
-    App.templateIntroScreen = App.doc.getElementById('intro-screen-template').innerHTML
-    App.templateNewGame = App.doc.getElementById('create-game-template').innerHTML
-    App.templateJoinGame = App.doc.getElementById('join-game-template').innerHTML
-    App.hostGame = App.doc.getElementById('host-game-template').innerHTML
-    App.playerGame = App.doc.getElementById('host-game-template').innerHTML
+    App.gameArea = document.getElementById('gameArea')
+    App.templateIntroScreen = document.getElementById('intro-screen-template').innerHTML
+    App.templateNewGame = document.getElementById('create-game-template').innerHTML
+    App.templateJoinGame = document.getElementById('join-game-template').innerHTML
+    App.observerScreen = document.getElementById('host-3-template').innerHTML
+    App.waitingScreen = document.getElementById('waiting-screen').innerHTML
+    App.hostGame = document.getElementById('host-game-template').innerHTML
+    App.playerGame = document.getElementById('host-game-template').innerHTML
+  },
+
+  showInitScreen: function () {
+    App.gameArea.innerHTML = App.templateIntroScreen
   },
 
   bindEvents: function () {
-    document.getElementById('btnCreateGame').onclick = function () {
+    document.getElementById('btnCreateGame2').onclick = function () {
+      App.Host.onCreateClick()
+    }
+    document.getElementById('btnCreateGame3').onclick = function () {
+      App.players3 = true
+      App.hostWord = document.getElementById('hostWord').value
+      chosenWord = App.hostWord
+      console.log('chosen word:' + chosenWord)
       App.Host.onCreateClick()
     }
     document.getElementById('btnJoinGame').onclick = function () {
       document.getElementById('btnStart').style.display = 'block'
       App.Player.onJoinClick()
     }
-    App.doc.getElementById('btnStart').onclick = function () {
+    document.getElementById('btnStart').onclick = function () {
       console.log('start clcked')
       App.Player.onPlayerStartClick()
     }
-  },
-
-  showInitScreen: function () {
-    App.gameArea.innerHTML = App.templateIntroScreen
   },
 
   Host: {
@@ -96,6 +114,8 @@ const App = {
 
     onCreateClick: function () {
       console.log('clicked "create"')
+      chosenWord = document.getElementById('hostWord').value
+      console.log('host word = ' + App.hostWord)
       IO.socket.emit('hostCreateNewGame')
     },
 
@@ -104,20 +124,21 @@ const App = {
       App.mySocketId = data.mySocketId
       App.myRole = 'Host'
       App.Host.numPlayersInRoom = 0
+      // App.hostWord = ' '
       App.Host.displayNewGameScreen()
     },
 
     displayNewGameScreen: function () {
       // Fill the game screen with the appropriate HTML
-      App.gameArea.innerHTML = App.templateNewGame
-
       // Show the gameId / room id on screen
+      App.gameArea.innerHTML = App.templateNewGame
       document.getElementById('spanNewGameCode').innerText = App.gameId
     },
 
     // for multiple players
     updateWaitingScreen: function (data) {
       // If this is a restarted game, show the screen.
+      App.gameArea.innerHTML = App.waitingScreen
       if (App.Host.isNewGame) {
         App.Host.displayNewGameScreen()
       }
@@ -126,11 +147,22 @@ const App = {
       // Increment the number of players in the room
       App.Host.numPlayersInRoom += 1
 
+      console.log(App.players3)
+      let numPlayers = 1
+      if (App.players2 === true) {
+        numPlayers = 1
+      } else if (App.players3 === true) {
+        numPlayers = 2
+      }
       // If one player(s) have joined, start the game!
       // change using if statements based on user input
-      if (App.Host.numPlayersInRoom === 1) {
+      if (App.Host.numPlayersInRoom === numPlayers) {
         // Let the server know that players are present.
-        IO.socket.emit('hostRoomFull', App.gameId)
+        if (App.players3) {
+          IO.socket.emit('hostRoomFull3', { gameId: App.gameId, newWord: chosenWord })
+        } else {
+          IO.socket.emit('hostRoomFull', App.gameId)
+        }
       }
     },
 
@@ -141,12 +173,20 @@ const App = {
       messageContainer.append(text)
     },
 
+    displayGame3: function () {
+      App.gameArea.innerHTML = App.observerScreen
+    },
+
     displayGame: function () {
       // Prepare the game screen with new HTML
       App.gameArea.innerHTML = App.hostGame
       IO.socket.emit('tellHostGameStarting', App.gameId)
 
-      const wordOfTheDay = 'train'
+      let wordOfTheDay = 'train'
+      const hostWord = chosenWord
+      if (hostWord.length === 5) {
+        wordOfTheDay = hostWord
+      }
       const messageContainer = document.querySelector('.messageContainer')
 
       const checkCurrentRow = (
@@ -159,7 +199,7 @@ const App = {
         if (currentElement === 5) {
           const currentGuess = rowsOfGuesses[currentRow].join('').toLowerCase()
           if (currentGuess === wordOfTheDay) {
-            messageContainer.textContent = 'Correct'
+            messageContainer.textContent = 'COORECCCTTTT'
             const data = {
               myRole: App.myRole,
               gameId: App.gameId
@@ -340,19 +380,18 @@ const App = {
       console.log('Player clicked "Start"')
       // collect data to send to the server
       const data = {
-        gameId: +(document.getElementById('inputGameId').value),
-        playerName: document.getElementById('inputPlayerName').value || 'anon'
+        gameId: +(document.getElementById('inputGameId').value)
+        // playerName: document.getElementById('inputPlayerName').value || 'anon'
       }
-
+      console.log('chosen word:' + chosenWord)
+      App.myRole = 'Player'
       // Send the gameId and playerName to the server
       IO.socket.emit('playerJoinGame', data)
-
-      // Set the appropriate properties for the current player.
-      App.myRole = 'Player'
-      App.Player.myName = data.playerName
+      // App.Player.myName = data.playerName
     },
 
     updateWaitingScreen: function (data) {
+      App.gameArea.innerHTML = App.waitingScreen
       if (IO.socket.id === data.mySocketId) {
         App.myRole = 'Player'
         App.gameId = data.gameId
@@ -368,13 +407,15 @@ const App = {
 
     displayGame: function (hostData) {
       App.Player.hostSocketId = hostData.mySocketId
-      // $('#gameArea')
-      // .html('<div class="gameOver">Get Ready!</div>')
 
       App.gameArea.innerHTML = App.playerGame
-      IO.socket.emit('hostCountdownFinished', App.gameId)
+      // IO.socket.emit('hostCountdownFinished', App.gameId)
 
-      const wordOfTheDay = 'train'
+      let wordOfTheDay = 'train'
+      const hostWord = chosenWord
+      if (hostWord.length === 5) {
+        wordOfTheDay = hostWord
+      }
       const messageContainer = document.querySelector('.messageContainer')
 
       const checkCurrentRow = (
@@ -554,5 +595,6 @@ const App = {
   }
 
 }
+let chosenWord = ''
 IO.init()
 App.init()

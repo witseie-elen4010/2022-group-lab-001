@@ -22,11 +22,22 @@
             <div class="title">
                 MULTIWORDLE
             </div>
-
+<h3>When you create a 2 player game, you will play against an opponent and try to guess a random word</h3>
+<h3>When you create a 3 player game, you will choose the word for 2 players to play against each other with </h3>
             <div style= 'text-align:center' class="buttons">
 
-                <button id="btnCreateGame" class="Button">CREATE</button>
-                <button id="btnJoinGame" class="Button">JOIN</button>
+                <button id="btnCreateGame2" class="Button">CREATE 2 Player Game</button>
+                <br>
+                <br>
+                <br>
+                <br>
+                <input id="hostWord" type="text" placeholder = 'Choose a 5-letter Word' />
+                 <button id="btnCreateGame3" class="Button">CREATE 3 Player Game</button>
+                 <br>
+                 <br>
+                 <br>
+                 <br>
+                <button id="btnJoinGame" class="Button">JOIN a Game</button>
                 <div style="clear:both"></div>
             </div>
 
@@ -41,6 +52,7 @@
             <div id="spanNewGameCode" class="gameId"></div>
 
             <div id="playersWaiting"></div>
+            
         </div>
     </script>
 
@@ -48,10 +60,7 @@
     <button id="btnStart" style= 'display: none;' class = 'Button'>START</button>
     <script id="join-game-template" type="text/template">
         <div style= 'text-align:center' class="joinGameWrapper">
-            <div class="info">
-                <input id="inputPlayerName" type="text" placeholder = 'your name' />
-            </div>
-
+            
             <div class="info">
                 <input id="inputGameId" type="text" placeholder = 'Game ID' />
             </div>
@@ -60,11 +69,23 @@
         </div>
     </script>
 
+    <script id="waiting-screen" type="text/template">
+            <div class="titleWrapper">
+                    <h3>waiting for players</h3>
+            </div>
+            </script>
+    <script id="host-3-template" type="text/template">
+        <div class="titleWrapper">
+                <h3>just for the host</h3>
+        </div>
+        </script>
+
     <!-- This is the 'Host' screen. It displays the word for each player to match -->
     <script id="host-game-template" type="text/template">
         <div id="wordArea">
         </div>
         
+
 <div class="gameContainer">
             <div class="title">
                   <h1>MULTIWORDLE Multi PLAYER</h1>
