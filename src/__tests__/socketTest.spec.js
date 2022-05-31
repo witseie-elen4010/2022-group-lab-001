@@ -28,5 +28,3 @@ describe('socket.io emits and performs functions', function () {
     }
   })
 })
-const port = process.env.PORT || 3000
-serv.listen(port)
