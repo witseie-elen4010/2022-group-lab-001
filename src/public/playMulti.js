@@ -167,8 +167,8 @@ const App = {
 
     declareWinner: function (data) {
       console.log('Winner2 is' + data.myRole)
-      const messageContainer = document.querySelector('.messageContainer')
-      const text = data.myRole + ' Won!'
+      const messageContainer1 = document.querySelector('.messageContainer')
+      const text =  data.myRole + ' Won!'
       messageContainer.append(text)
     },
 
@@ -381,6 +381,9 @@ const App = {
                   } else {
                     if (currentRow === 5) {
                       feedbackForGuess('Try again tomorrow')
+                      fetch('/word/revealWord')
+                  .then((response)=>response.json())
+                  .then((data)=> (messageContainer.append('\n The correct answer is: ',data.toUpperCase())))
                       isGameEnded = true
                       return
                     }
@@ -689,6 +692,9 @@ const App = {
                   } else {
                     if (currentRow === 5) {
                       feedbackForGuess('Try again tomorrow')
+                      fetch('/word/revealWord')
+                  .then((response)=>response.json())
+                  .then((data)=> (messageContainer.append('The correct answer is: ',data.toUpperCase())))
                       isGameEnded = true
                       return
                     }

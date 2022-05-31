@@ -66,11 +66,16 @@ const wordIsValid = (request, response) => {
   response.json(validWords.includes(currentGuess))
 }
 
+const revealWord=(request, response)=>{
+  response.json(getWordOfTheDay())
+}
+
 module.exports = {
   getWordOfTheDay,
   getRandomIndexBasedOnDate,
   wordIsValid,
   isWordOfTheDay,
-  assignColours
+  assignColours,
+  revealWord
 
 }
