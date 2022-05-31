@@ -118,7 +118,7 @@ const requestFeedback = async () => {
   currentTiles.forEach(tile => {
     guessedWord.push(tile.getAttribute('data'))
   })
-  const guessJson = { guessJson: guessedWord }
+  const guessJson = { guessJson: guessedWord, chosen: '' }
   const options = {
     method: 'POST',
 
@@ -150,7 +150,7 @@ function revealFeedback (colours) {
 function checkCurrentRow () {
   if (currentTile > 4) {
     const currentGuess = boardArray[currentRow].join('').toLowerCase()
-    const guess = { guess: currentGuess }
+    const guess = { guess: currentGuess, chosen: '' }
     wordIsValid(guess).then(isValid => {
       if (!isValid) {
         feedbackForGuess('Invalid Word')

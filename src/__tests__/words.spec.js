@@ -1,43 +1,43 @@
 /* eslint-env jest */
 
 const dictionary = require('../models/dictionary')
-const validWords = dictionary.getDictionary();
+const validWords = dictionary.getDictionary()
 const request = require('supertest')
 const wordController = require('../controllers/wordController')
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 
-const router = require('../routes/wordRoutes');
+const router = require('../routes/wordRoutes')
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use('/', router)
 test('the word of the day is train, it should return green,green,green,green,green which corresponds to the class used in css to change its appearance', async () => {
-  let wordOfTheDay = wordController.getWordOfTheDay().toUpperCase()
-  const splitWord = wordOfTheDay.split('');
-  const body = { guessJson: splitWord }
+  const wordOfTheDay = wordController.getWordOfTheDay().toUpperCase()
+  const splitWord = wordOfTheDay.split('')
+  const body = { guessJson: splitWord, chosen: '' }
   const response = await request(app).post('/getColours').send(body)
   expect(response.statusCode).toBe(200)
   expect(response.body).toStrictEqual(['green-block', 'green-block', 'green-block', 'green-block', 'green-block'])
 })
 
 test('the word of the day is train, it should return green,green,green,grey which corresponds to the class used in css to change its appearance', async () => {
-  let wordOfTheDay = wordController.getWordOfTheDay().toUpperCase()
-  const splitWord = wordOfTheDay.split('');
+  const wordOfTheDay = wordController.getWordOfTheDay().toUpperCase()
+  const splitWord = wordOfTheDay.split('')
   splitWord[splitWord.length - 1] = 'q'
-  const body = { guessJson: splitWord }
+  const body = { guessJson: splitWord, chosen: '' }
   const response = await request(app).post('/getColours').send(body)
   expect(response.statusCode).toBe(200)
   expect(response.body).toStrictEqual(['green-block', 'green-block', 'green-block', 'green-block', 'grey-block'])
 })
 
 test('the word of the day is train, it should return blue,green,green,blue which corresponds to the class used in css to change its appearance', async () => {
-  let wordOfTheDay = wordController.getWordOfTheDay().toUpperCase()
-  const splitWord = wordOfTheDay.split('');
-  let temp = splitWord[splitWord.length - 1]
+  const wordOfTheDay = wordController.getWordOfTheDay().toUpperCase()
+  const splitWord = wordOfTheDay.split('')
+  const temp = splitWord[splitWord.length - 1]
   splitWord[splitWord.length - 1] = splitWord[0]
   splitWord[0] = temp
-  const body = { guessJson: splitWord }
+  const body = { guessJson: splitWord, chosen: '' }
   const response = await request(app).post('/getColours').send(body)
   expect(response.statusCode).toBe(200)
   expect(response.body).toStrictEqual(['blue-block', 'green-block', 'green-block', 'green-block', 'blue-block'])
@@ -53,21 +53,19 @@ describe('When making a request to /word', () => {
 
 test('Testing post request to check if a word is equal to the word of the day the response is correct', async () => {
   const wordOfTheDay = wordController.getWordOfTheDay()
-  const body = { guess: wordOfTheDay }
+  const body = { guess: wordOfTheDay, chosen: '' }
   const response = await request(app).post('/isWordOfTheDay').send(body)
   expect(response.statusCode).toBe(200)
   expect(response.body).toBe('word of the day')
 })
 
 describe('When making a request to /wordIsValid', () => {
-
   it('Tests if a valid word sent to /wordIsValid returns true', async () => {
     const validWord = validWords[8]
     const body = { guess: validWord }
     const response = await request(app).post('/wordIsValid').send(body)
     expect(response.statusCode).toBe(200)
     expect(response.body).toBe(true)
-
   })
 
   it('Tests if an invalid word sent to /wordIsValid returns false', async () => {
@@ -75,9 +73,7 @@ describe('When making a request to /wordIsValid', () => {
     const response = await request(app).post('/wordIsValid').send(body)
     expect(response.statusCode).toBe(200)
     expect(response.body).toBe(false)
-
   })
-
 })
 
 test('Tests whether a new index is generated per day', () => {

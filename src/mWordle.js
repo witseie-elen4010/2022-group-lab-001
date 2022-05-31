@@ -11,6 +11,8 @@ exports.initGame = function (IO, socket) {
   // host events
   wordleSocket.on('hostCreateNewGame', hostCreateNewGame)
   wordleSocket.on('hostRoomFull', setupGame)
+  wordleSocket.on('hostRoomFull3', setupGame3)
+
   wordleSocket.on('tellHostGameStarting', startGame)
   // player events
   wordleSocket.on('playerJoinGame', playerJoinGame)
@@ -19,7 +21,7 @@ exports.initGame = function (IO, socket) {
 
 function hostCreateNewGame () {
   // Create a unique Socket.IO Room
-  const GameId = (Math.random() * 10000) | 0
+  const GameId = (Math.random() * 100000) | 0
   // Return Room ID (gameId) and the socket ID (mySocketId) to the browser client
   this.emit('gameCreated', { gameId: GameId, mySocketId: this.id })
   this.join(GameId)
@@ -34,19 +36,24 @@ function setupGame (gameId) {
   io.sockets.in(data.gameId).emit('beginGame', data)
 }
 
+function setupGame3 (data1) {
+  console.log('in HostFull3.')
+
+  const sock = data1
+  const data = {
+    mySocketId: sock.gameId,
+    newWord: data1.newWord, // sending chosen word to other players
+    gameId: data1.gameId
+  }
+  io.sockets.in(data.gameId).emit('beginGame3', data)
+}
+
 function startGame (gameId) {
   console.log('Game Started.')
-  // sendWord(0, gameId) // this would be for the option of one player choosing the word.
 };
 
-/* function sendWord (word, gameId) {
-  const data = 'hello'
-  io.sockets.in(gameId).emit('newWordData', data)
-}
-*/
-
 function playerJoinGame (data) {
-  console.log('Player ' + data.playerName + ' is attempting to join game: ' + data.gameId)
+  // console.log('Player ' + data.playerName + ' is attempting to join game: ' + data.gameId)
 
   const sock = this
 
@@ -58,7 +65,7 @@ function playerJoinGame (data) {
     data.mySocketId = sock.id
     wordleSocket.join(data.gameId)
 
-    console.log('Player ' + data.playerName + ' joining game: ' + data.gameId)
+    // console.log('Player ' + data.playerName + ' joining game: ' + data.gameId)
 
     io.sockets.in(data.gameId).emit('playerJoinedRoom', data)
   } else {
