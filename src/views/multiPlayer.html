@@ -4,11 +4,44 @@
 <head>
     <title>MULTIWORDLE</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="/cdn/style.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>        
+    <link rel="stylesheet" href="/cdn/style.css">
 
 
 <body>
-
+<div class="container">
+    <!-- Trigger the modal with a button -->
+    <button type="button" class="btn btn-info btn-lg pull-right" data-toggle="modal" data-target="#Instruction" >Instructions </button>
+    
+    <!-- Modal -->
+    <div class="modal fade" id="Instruction" role="dialog">
+        <div class="modal-dialog">
+        
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">How To Play:</h4>
+            </div>
+            <div class="modal-body">
+            <p style="color: black;">Guess a 5 letter word and enter it via the onscreen keyboard or via your physical keyboard.<br>
+            Click Enter <br>
+            If the word you entered is valid, you will be given feedback: <br></p>  <b>
+            <p style="color:mediumseagreen";> Green: The letter is in the word of the day and in the correct position <br> </p>
+            <p style="color:DodgerBlue"> Blue: The letter is in the word of the day but is in the wrong position <br></p>
+            <p style="color:gray"> Grey: The letter is not in the word of the day <br></p></b>
+            
+            
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        
+        </div>
+    </div>
 
     <div id="gameArea">
         <!-- This is where the templates defined below will be used -->
@@ -19,10 +52,10 @@
         <div class="titleWrapper">
 
             <div class="title">
-                MULTIWORDLE
+               <h1> MULTIWORDLE </h1>
             </div>
-<h3 style= 'text-align:center'>When you create a 2 player game, you will play against an opponent and try to guess a random word</h3>
-<h3 style= 'text-align:center'>When you create a 3 player game, you will choose the word with which 2 other players will play against each other  </h3>
+<h5 style= 'text-align:center'>When you create a 2 player game, you will play against an opponent and try to guess a random word</h5>
+<h5 style= 'text-align:center'>When you create a 3 player game, you will choose the word with which 2 other players will play against each other  </h5>
             <div style= 'text-align:center' class="buttons">
 
                 <button id="btnCreateGame2" class="Button">CREATE 2 Player Game</button>
@@ -41,7 +74,7 @@
             </div>
 
         </div>
-
+    </div>
     </script>
 
     <script id="create-game-template" type="text/template">
@@ -107,6 +140,7 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script type="module" src="/cdn/playMulti.js"></script>
+
 </body>
 
 </html>
