@@ -41,28 +41,61 @@
     <head>
         <meta charset="utf-8">
         <title> Login</title>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>        
         <link rel="stylesheet" href="/cdn/style.css">
         <script defer src="/cdn/scripts/login.js"> </script>
-
-
-
     </head>
 
-    <body>
-        <form class="box" id="login-form">
+<body>
+<div class="container">
+    <!-- Trigger the modal with a button -->
+    <button type="button" class="btn btn-info btn-lg pull-right" data-toggle="modal" data-target="#Instruction" >Instructions </button>
+    
+    <!-- Modal -->
+    <div class="modal fade" id="Instruction" role="dialog">
+        <div class="modal-dialog">
+        
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Single Player</h4>
+            </div>
+            <div class="modal-body">
+            <p style="color: black;">Guess a 5 letter word and enter it via the onscreen keyboard or via your physical keyboard.<br>
+            Click Enter <br>
+            If the word you entered is valid, you will be given feedback: <br></p>  <b>
+           <p style="color:mediumseagreen";> Green: The letter is in the word of the day and in the correct position <br> </p>
+           <p style="color:DodgerBlue"> Blue: The letter is in the word of the day but is in the wrong position <br></p>
+           <p style="color:gray"> Grey: The letter is not in the word of the day <br></p>
+           
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        
+        </div>
+    </div>
+    
 
-            <h1>
-                login
-            </h1>
-            <input type="text" name="username" placeholder="Enter Username" id="username-field">
-            <input type="password" name="password" placeholder="Enter Password" id="password-field">
-            <input type="submit" name="" value="Login" id="login-form-submit">
+    <form class="box" id="login-form">
+
+        <h1>
+            login
+        </h1>
+        <input type="text" name="username" placeholder="Enter Username" id="username-field">
+        <input type="password" name="password" placeholder="Enter Password" id="password-field">
+        <input type="submit" name="" value="Login" id="login-form-submit">
 
 
-        </form>
-        <a href="/views/signup">Sign Up</a>
-
-    </body>
+    </form>
+    <a href="/views/signup">Sign Up</a>
+</div>
+</body>
 
 
 
