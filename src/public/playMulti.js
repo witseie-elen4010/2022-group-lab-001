@@ -167,7 +167,7 @@ const App = {
 
     declareWinner: function (data) {
       console.log('Winner2 is' + data.myRole)
-      const messageContainer1 = document.querySelector('.messageContainer')
+      const messageContainer = document.querySelector('.messageContainer')
       const text =  data.myRole + ' Won!'
       messageContainer.append(text)
     },
