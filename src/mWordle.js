@@ -57,7 +57,6 @@ function startGame (gameId) {
 };
 
 function playerJoinGame (data) {
-  // console.log('Player ' + data.playerName + ' is attempting to join game: ' + data.gameId)
   numPlayers += 1
   player3 = true
   const sock = this
@@ -71,7 +70,7 @@ function playerJoinGame (data) {
     data.mySocketId = sock.id
     wordleSocket.join(data.gameId)
 
-    // console.log('Player ' + data.playerName + ' joining game: ' + data.gameId)
+  
 
     io.sockets.in(data.gameId).emit('playerJoinedRoom', data)
   } else {
@@ -83,12 +82,12 @@ function letOthersKnowWinner (data) {
   // tell clients if someone won
   console.log('Winner is' + data.myRole)
   io.sockets.in(data.gameId).emit('winner', data)
-  // this.emit('winner', data)
+
 }
 
 function letOthersKnowColours (data) {
   // tell all clients progress of most recent players turn
   console.log('colours revealed from ' + data.myRole + 's last Turn')
   io.sockets.in(data.gameId).emit('revealColours', data)
-  // this.emit('winner', data)
+
 }

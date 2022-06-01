@@ -68,7 +68,7 @@ const App = {
   players2: false,
   players3: false,
   hostWord: '',
-  // numPlayers: 0,
+
 
   init: function () {
     App.cacheElements()
@@ -105,8 +105,6 @@ const App = {
     }
     document.getElementById('btnJoinGame').onclick = function () {
       document.getElementById('btnStart').style.display = 'block'
-      // App.Host.numPlayers += 1
-      // numberPlayers += 1
       App.Player.onJoinClick()
     }
     document.getElementById('btnStart').onclick = function () {
@@ -134,7 +132,6 @@ const App = {
       App.mySocketId = data.mySocketId
       App.myRole = 'Host'
       App.Host.numPlayersInRoom = 0
-      // App.hostWord = ' '
       App.Host.displayNewGameScreen()
     },
 
@@ -157,9 +154,6 @@ const App = {
       App.Host.numPlayersInRoom += 1
       console.log('numberPlayers' + numberPlayers + 'App.players3' + App.players3)
       console.log('data.nplayers;' + data.nplayers + 'App.players3' + App.players3)
-      // if (data.nplayers === 1 && App.players3) {
-      // App.myRole = 'Player2'
-      // }
       console.log('host myrole: ' + App.myRole)
       console.log(App.players3)
       let numPlayers = 1
@@ -388,12 +382,12 @@ const App = {
           wordIsValid(guess).then(isValid => {
             if (!isValid) {
               feedbackForGuess('Invalid Word')
-              // delete letters in the row
+           
             } else {
               const feedbackRow = currentRow
               requestFeedback().then((colours) => {
                 revealFeedback(colours, feedbackRow)
-                // here
+             
                 const data = {
                   myRole: App.myRole,
                   gameId: App.gameId,
@@ -402,7 +396,7 @@ const App = {
                 }
                 IO.socket.emit('revealColours', data)// so other players can know aswell
 
-                // end here
+              
               })
               const options = {
                 method: 'POST',
@@ -412,7 +406,7 @@ const App = {
                 },
                 body: JSON.stringify(guess)
               }
-              // const hostWord = chosenWord
+           
 
               fetch('/word/isWordOfTheDay', options)
                 .then((res) => res.json())
@@ -509,13 +503,12 @@ const App = {
       const data = {
         gameId: +(document.getElementById('inputGameId').value),
         nplayers: numberPlayers
-        // playerName: document.getElementById('inputPlayerName').value || 'anon'
+  
       }
       console.log('chosen word:' + chosenWord)
-      // App.myRole = 'Player'
-      // Send the gameId and playerName to the server
+
       IO.socket.emit('playerJoinGame', data)
-      // App.Player.myName = data.playerName
+
     },
 
     updateWaitingScreen: function (data) {
@@ -562,7 +555,7 @@ const App = {
       App.Player.hostSocketId = hostData.mySocketId
 
       App.gameArea.innerHTML = App.playerGame
-      // IO.socket.emit('hostCountdownFinished', App.gameId)
+
 
       const messageContainer = document.querySelector('.messageContainer')
       const keyboard = document.querySelector('.keyContainer')
@@ -742,7 +735,7 @@ const App = {
               const feedbackRow = currentRow// ensures it wont change before callbacl complete
               requestFeedback().then((colours) => {
                 revealFeedback(colours, feedbackRow)
-                // here
+
                 const data = {
                   myRole: App.myRole,
                   gameId: App.gameId,
@@ -751,7 +744,7 @@ const App = {
                 }
                 IO.socket.emit('revealColours', data)// so other players can know aswell
 
-              // end here
+
               })
 
               const options = {
