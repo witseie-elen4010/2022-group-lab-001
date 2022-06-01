@@ -133,8 +133,8 @@ const requestFeedback = async () => {
   return colours
 }
 
-function revealFeedback (colours) {
-  const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes
+function revealFeedback (colours, feedbackRow) {
+  const currentTiles = document.querySelector('#boardRow-' + feedbackRow).childNodes
   currentTiles.forEach((tile, index) => {
     setTimeout(() => {
       tile.classList.add('flip') // (causes flip animation)
@@ -156,7 +156,8 @@ function checkCurrentRow () {
         feedbackForGuess('Invalid Word')
         // delete letters in the row
       } else {
-       requestFeedback().then((colours) => revealFeedback(colours))
+        let feedbackRow=currentRow//prevents row from changing before callback called
+        requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
         const options = {
           method: 'POST',
 
@@ -208,7 +209,7 @@ const handleClick = (letter) => {
     addLetter(letter)
   }
 }
-function generateKeyboard () {
+function activateOnscreenKeyBoard () {
   keys.forEach((key) => {
     const buttonTag = document.createElement('button')
     buttonTag.textContent = key
@@ -234,4 +235,4 @@ function feedbackForGuess (feedback) {
 
 generateBoard()
 activatePhysicalKeyBoard()
-generateKeyboard()
+activateOnscreenKeyBoard()
