@@ -16,8 +16,6 @@ const IO = {
     IO.socket.on('newWordData', IO.onNewWordData)
     IO.socket.on('winner', IO.othersKnowIfYouWon)
     IO.socket.on('revealColours', IO.othersKnowColours)
-
-
   },
 
   onConnected: function () {
@@ -40,12 +38,15 @@ const IO = {
   beginGame3: function (data) {
     chosenWord = data.newWord
     console.log('beginGame3 word:' + chosenWord)
-    if (App.myRole === 'Player') {
-      App.Player.displayGame(data)
-    }
     if (App.myRole === 'Host') {
       App.Host.displayGame3(data)
+      App.myRole = ''
     }
+
+    if (App.myRole === 'Player2') {
+      App.myRole = 'Host'
+    }
+    App[App.myRole].displayGame(data)
   },
   onNewWordData: function (data) {
     App[App.myRole].newWord(data)
@@ -57,7 +58,6 @@ const IO = {
     App[App.myRole].displayColours(data)
   }
 
-
 }
 
 const App = {
@@ -68,6 +68,7 @@ const App = {
   players2: false,
   players3: false,
   hostWord: '',
+  // numPlayers: 0,
 
   init: function () {
     App.cacheElements()
@@ -104,6 +105,8 @@ const App = {
     }
     document.getElementById('btnJoinGame').onclick = function () {
       document.getElementById('btnStart').style.display = 'block'
+      // App.Host.numPlayers += 1
+      // numberPlayers += 1
       App.Player.onJoinClick()
     }
     document.getElementById('btnStart').onclick = function () {
@@ -152,7 +155,12 @@ const App = {
 
       // Increment the number of players in the room
       App.Host.numPlayersInRoom += 1
-
+      console.log('numberPlayers' + numberPlayers + 'App.players3' + App.players3)
+      console.log('data.nplayers;' + data.nplayers + 'App.players3' + App.players3)
+      // if (data.nplayers === 1 && App.players3) {
+      // App.myRole = 'Player2'
+      // }
+      console.log('host myrole: ' + App.myRole)
       console.log(App.players3)
       let numPlayers = 1
       if (App.players2 === true) {
@@ -179,9 +187,9 @@ const App = {
       messageContainer.append(text)
     },
 
-    //the function below used to be much further down( abovecheck current row) in the code, I have moved it up
+    // the function below used to be much further down( abovecheck current row) in the code, I have moved it up
 
-     revealFeedback: function (colours,  feedbackRow) {
+    revealFeedback: function (colours, feedbackRow) {
       const currentTiles = document.querySelector('#board2Row-' + feedbackRow).childNodes
       currentTiles.forEach((tile, index) => {
         setTimeout(() => {
@@ -191,11 +199,10 @@ const App = {
       })
     },
 
-
     displayColours: function (data) {
-      if (data.myRole==="Player") {
-      console.log('colours revealed from ' + data.myRole + 's last Turn' )
-      this.revealFeedback(data.colours, data.row)
+      if (data.myRole === 'Player') {
+        console.log('colours revealed from ' + data.myRole + 's last Turn')
+        this.revealFeedback(data.colours, data.row)
       }
     },
 
@@ -336,7 +343,6 @@ const App = {
 
         return isValid
       }
-    
 
       const requestFeedback = async () => {
         const currentTiles = document.querySelector('#board1Row-' + currentRow).childNodes
@@ -359,7 +365,7 @@ const App = {
         const colours = await response.json()
         return colours
       }
-//the function below used to be much further down( abovecheck current row) in the code, I have moved it up
+      // the function below used to be much further down( abovecheck current row) in the code, I have moved it up
       function revealFeedback (colours, feedbackRow) {
         const currentTiles = document.querySelector('#board1Row-' + feedbackRow).childNodes
         currentTiles.forEach((tile, index) => {
@@ -384,19 +390,19 @@ const App = {
               feedbackForGuess('Invalid Word')
               // delete letters in the row
             } else {
-              let feedbackRow =currentRow
-              requestFeedback().then((colours) =>{ revealFeedback(colours, feedbackRow)
-                //here
-                 const data = {
+              const feedbackRow = currentRow
+              requestFeedback().then((colours) => {
+                revealFeedback(colours, feedbackRow)
+                // here
+                const data = {
                   myRole: App.myRole,
                   gameId: App.gameId,
-                  colours: colours, 
+                  colours,
                   row: feedbackRow
                 }
                 IO.socket.emit('revealColours', data)// so other players can know aswell
-  
-  
-                //end here
+
+                // end here
               })
               const options = {
                 method: 'POST',
@@ -491,18 +497,22 @@ const App = {
 
     onJoinClick: function () {
       console.log('Clicked "Join A Game"')
+      numberPlayers += 1
+      console.log('numberPlayers ' + numberPlayers)
       App.gameArea.innerHTML = App.templateJoinGame
     },
 
     onPlayerStartClick: function () {
       console.log('Player clicked "Start"')
       // collect data to send to the server
+      App.myRole = 'Player'
       const data = {
-        gameId: +(document.getElementById('inputGameId').value)
+        gameId: +(document.getElementById('inputGameId').value),
+        nplayers: numberPlayers
         // playerName: document.getElementById('inputPlayerName').value || 'anon'
       }
       console.log('chosen word:' + chosenWord)
-      App.myRole = 'Player'
+      // App.myRole = 'Player'
       // Send the gameId and playerName to the server
       IO.socket.emit('playerJoinGame', data)
       // App.Player.myName = data.playerName
@@ -515,7 +525,12 @@ const App = {
       if (IO.socket.id === data.mySocketId) {
         App.myRole = 'Player'
         App.gameId = data.gameId
+        console.log('in player updatescreen data.nplayers;' + data.nplayers + 'App.players3' + App.players3)
+        if (data.nplayers === 2 && data.players3) {
+          App.myRole = 'Player2'
+        }
       }
+      console.log('player myrole: ' + App.myRole)
     },
 
     declareWinner: function (data) {
@@ -536,9 +551,10 @@ const App = {
     },
 
     displayColours: function (data) {
-      if (data.myRole === 'Host'){
-      console.log('colours revealed from ' + data.myRole + 's last Turn' )
-      this.revealFeedback(data.colours, data.row)
+      console.log('in display colours, my role is ' + data.myRole)
+      if (data.myRole === 'Host') {
+        console.log('colours revealed from ' + data.myRole + 's last Turn')
+        this.revealFeedback(data.colours, data.row)
       }
     },
 
@@ -723,21 +739,21 @@ const App = {
               feedbackForGuess('Invalid Word')
               // delete letters in the row
             } else {
-              let feedbackRow=currentRow//ensures it wont change before callbacl complete
-              requestFeedback().then((colours) =>{ revealFeedback(colours, feedbackRow)
-              //here
-               const data = {
-                myRole: App.myRole,
-                gameId: App.gameId,
-                colours: colours, 
-                row: feedbackRow
-              }
-              IO.socket.emit('revealColours', data)// so other players can know aswell
+              const feedbackRow = currentRow// ensures it wont change before callbacl complete
+              requestFeedback().then((colours) => {
+                revealFeedback(colours, feedbackRow)
+                // here
+                const data = {
+                  myRole: App.myRole,
+                  gameId: App.gameId,
+                  colours,
+                  row: feedbackRow
+                }
+                IO.socket.emit('revealColours', data)// so other players can know aswell
 
+              // end here
+              })
 
-              //end here
-            })
-              
               const options = {
                 method: 'POST',
 
@@ -823,5 +839,6 @@ const App = {
 
 }
 let chosenWord = ''
+let numberPlayers = 0
 IO.init()
 App.init()
