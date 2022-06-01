@@ -381,9 +381,12 @@ const App = {
                   } else {
                     if (currentRow === 5) {
                       feedbackForGuess('Try again tomorrow')
+                      if(chosenWord.length===0){
                       fetch('/word/revealWord')
                   .then((response)=>response.json())
-                  .then((data)=> (messageContainer.append('\n The correct answer is: ',data.toUpperCase())))
+                  .then((data)=> (
+                    messageContainer.append('\n The correct answer is: ',data.toUpperCase())
+                    ))}else{messageContainer.append('\n The correct answer is: ',chosenWord.toUpperCase())}
                       isGameEnded = true
                       return
                     }
