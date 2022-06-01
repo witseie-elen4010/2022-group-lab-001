@@ -17,6 +17,8 @@ exports.initGame = function (IO, socket) {
   // player events
   wordleSocket.on('playerJoinGame', playerJoinGame)
   wordleSocket.on('gameWinner', letOthersKnowWinner)
+  wordleSocket.on('revealColours', letOthersKnowColours)
+
 }
 
 function hostCreateNewGame () {
@@ -79,3 +81,11 @@ function letOthersKnowWinner (data) {
   io.sockets.in(data.gameId).emit('winner', data)
   // this.emit('winner', data)
 }
+
+function letOthersKnowColours (data) {
+  // tell all clients progress of most recent players turn
+  console.log('colours revealed from ' + data.myRole + 's last Turn' )
+  io.sockets.in(data.gameId).emit('revealColours', data)
+  // this.emit('winner', data)
+}
+
