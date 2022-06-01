@@ -13,7 +13,7 @@
 <body>
 <div class="container">
     <!-- Trigger the modal with a button -->
-    <button type="button" class="btn btn-info btn-lg pull-right" data-toggle="modal" data-target="#Instruction" >Instructions </button>
+    <button type="button" class="btn btn-info btn-lg pull-right" data-toggle="modal" data-target="#Instruction" >Multi-Player Instructions </button>
     
     <!-- Modal -->
     <div class="modal fade" id="Instruction" role="dialog">
@@ -23,15 +23,27 @@
         <div class="modal-content">
             <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">How To Play:</h4>
+            <h3 class="modal-title">Multiplayer Information:</h3>
             </div>
             <div class="modal-body">
-            <p style="color: black;">Guess a 5 letter word and enter it via the onscreen keyboard or via your physical keyboard.<br>
+            <h3 style="color: black;">There are two options to choose from:</h3> <nr>
+            <h4> Option 1: Two Player Game - Guessing the word of the day</h4>
+                <p style="color:black">One player needs to start the game by clicking on "CREATE 2 Player Game". This will generate a unique game ID. <br>
+            This player should then share the game ID with one other person.  <br> The second player must click on "JOIN a Game" and enter the Game ID they 
+            have recieved from the other player <br> Both players must try and guess the word of the day </p>
+            <h4> Option 2: Three Player Game -Guessing a word chosen by one of the players</h4>
+            <p style="color:black">One player needs to start the game by entering a 5-letter word of their choice and clicking on "CREATE 3 Player Game". This will generate a unique game ID. <br>
+            This player should then share the game ID with two other person.  <br> The second and third player must click on "JOIN a Game" and enter the Game ID they 
+            have recieved from the first player <br> Both players must try and guess the word the first player has generated </p>
+            <h4> Once a Multi-player game has began:</h4>
+            <p style="color: black;">Each player must guess a 5 letter word and enter it via the onscreen keyboard or via your physical keyboard.<br>
             Click Enter <br>
             If the word you entered is valid, you will be given feedback: <br></p>  <b>
             <p style="color:mediumseagreen";> Green: The letter is in the word of the day and in the correct position <br> </p>
             <p style="color:DodgerBlue"> Blue: The letter is in the word of the day but is in the wrong position <br></p>
             <p style="color:gray"> Grey: The letter is not in the word of the day <br></p></b>
+            <h4 style="color: orangered;">The first player to correctly guess the word WINS!!!.<br></h4>
+
             
             
             </div>
