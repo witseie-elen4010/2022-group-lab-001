@@ -176,6 +176,10 @@ function checkCurrentRow () {
             } else {
               if (currentRow === 5) {
                 feedbackForGuess('Try again tomorrow')
+                fetch('/word/revealWord')
+                  .then((response)=>response.json())
+                  .then((data)=> (messageContainer.append('Try again tomorrow :) !!! Today\'s word was: ',data.toUpperCase())))
+                  
                 isGameEnded = true
                 return
               }
@@ -226,8 +230,9 @@ function feedbackForGuess (feedback) {
   const feedbackElement = document.createElement('p')
   feedbackElement.textContent = feedback
   messageContainer.append(feedbackElement)
-  setTimeout(() => messageContainer.removeChild(feedbackElement), 1000)
+  setTimeout(() => messageContainer.removeChild(feedbackElement), 3000)
 }
+
 generateBoard()
 activatePhysicalKeyBoard()
 activateOnscreenKeyBoard()

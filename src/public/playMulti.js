@@ -15,6 +15,7 @@ const IO = {
     IO.socket.on('beginGame3', IO.beginGame3)
     IO.socket.on('newWordData', IO.onNewWordData)
     IO.socket.on('winner', IO.othersKnowIfYouWon)
+    IO.socket.on('revealColours', IO.othersKnowColours)
   },
 
   onConnected: function () {
@@ -37,18 +38,24 @@ const IO = {
   beginGame3: function (data) {
     chosenWord = data.newWord
     console.log('beginGame3 word:' + chosenWord)
-    if (App.myRole === 'Player') {
-      App.Player.displayGame(data)
-    }
     if (App.myRole === 'Host') {
       App.Host.displayGame3(data)
+      App.myRole = ''
     }
+
+    if (App.myRole === 'Player2') {
+      App.myRole = 'Host'
+    }
+    App[App.myRole].displayGame(data)
   },
   onNewWordData: function (data) {
     App[App.myRole].newWord(data)
   },
   othersKnowIfYouWon: function (data) {
     App[App.myRole].declareWinner(data)
+  },
+  othersKnowColours: function (data) {
+    App[App.myRole].displayColours(data)
   }
 
 }
@@ -61,6 +68,7 @@ const App = {
   players2: false,
   players3: false,
   hostWord: '',
+
 
   init: function () {
     App.cacheElements()
@@ -124,7 +132,6 @@ const App = {
       App.mySocketId = data.mySocketId
       App.myRole = 'Host'
       App.Host.numPlayersInRoom = 0
-      // App.hostWord = ' '
       App.Host.displayNewGameScreen()
     },
 
@@ -145,7 +152,9 @@ const App = {
 
       // Increment the number of players in the room
       App.Host.numPlayersInRoom += 1
-
+      console.log('numberPlayers' + numberPlayers + 'App.players3' + App.players3)
+      console.log('data.nplayers;' + data.nplayers + 'App.players3' + App.players3)
+      console.log('host myrole: ' + App.myRole)
       console.log(App.players3)
       let numPlayers = 1
       if (App.players2 === true) {
@@ -168,8 +177,27 @@ const App = {
     declareWinner: function (data) {
       console.log('Winner2 is' + data.myRole)
       const messageContainer = document.querySelector('.messageContainer')
-      const text = data.myRole + ' Won!'
+      const text =  data.myRole + ' has guessed the word correctly!'
       messageContainer.append(text)
+    },
+
+    // the function below used to be much further down( abovecheck current row) in the code, I have moved it up
+
+    revealFeedback: function (colours, feedbackRow) {
+      const currentTiles = document.querySelector('#board2Row-' + feedbackRow).childNodes
+      currentTiles.forEach((tile, index) => {
+        setTimeout(() => {
+          tile.classList.add('flip') // (causes flip animation)
+          tile.classList.add(colours[index])// asign each tile to the approriate colour class to change its colour
+        }, 300 * index)// ensure they dont all flip and change colour  at the same time, Higher indexes executed after more time
+      })
+    },
+
+    displayColours: function (data) {
+      if (data.myRole === 'Player') {
+        console.log('colours revealed from ' + data.myRole + 's last Turn')
+        this.revealFeedback(data.colours, data.row)
+      }
     },
 
     displayGame3: function () {
@@ -230,12 +258,12 @@ const App = {
         // Loop through each row and each tile to create the board
         boardArray.forEach((boardRow, boardRowIndex) => {
           const rowElement = document.createElement('div')
-          rowElement.setAttribute('id', 'boardRow-' + boardRowIndex)
+          rowElement.setAttribute('id', 'board1Row-' + boardRowIndex)
           boardRow.forEach((tile, tileIndex) => {
             const tileElement = document.createElement('div')
             tileElement.setAttribute(
               'id',
-              'boardRow-' + boardRowIndex + '-tile-' + tileIndex
+              'board1Row-' + boardRowIndex + '-tile-' + tileIndex
             )
             tileElement.classList.add('tile')
             rowElement.append(tileElement)
@@ -247,12 +275,12 @@ const App = {
         // Loop through each row and each tile to create the board
         boardArray.forEach((boardRow, boardRowIndex) => {
           const rowElement = document.createElement('div')
-          rowElement.setAttribute('id', 'boardRow-' + boardRowIndex)
+          rowElement.setAttribute('id', 'board2Row-' + boardRowIndex)
           boardRow.forEach((tile, tileIndex) => {
             const tileElement = document.createElement('div')
             tileElement.setAttribute(
               'id',
-              'boardRow-' + boardRowIndex + '-tile-' + tileIndex
+              'board2Row-' + boardRowIndex + '-tile-' + tileIndex
             )
             tileElement.classList.add('tile')
             rowElement.append(tileElement)
@@ -272,7 +300,7 @@ const App = {
         // to ensure we only enter 5 letters in one row
         if (currentTile < 5 && currentRow < 6) {
           const tile = document.getElementById(
-            'boardRow-' + currentRow + '-tile-' + currentTile
+            'board1Row-' + currentRow + '-tile-' + currentTile
           )
           tile.textContent = letter
           boardArray[currentRow][currentTile] = letter
@@ -289,7 +317,7 @@ const App = {
       function removeLetter () {
         if (currentTile > 0) {
           currentTile--
-          const tile = document.getElementById('boardRow-' + currentRow + '-tile-' + currentTile)
+          const tile = document.getElementById('board1Row-' + currentRow + '-tile-' + currentTile)
           tile.textContent = ''
           boardArray[currentRow][currentTile] = ''
         }
@@ -311,11 +339,12 @@ const App = {
       }
 
       const requestFeedback = async () => {
-        const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes
+        const currentTiles = document.querySelector('#board1Row-' + currentRow).childNodes
         const guessedWord = []
         currentTiles.forEach(tile => {
           guessedWord.push(tile.getAttribute('data'))
         })
+
         const guessJson = { guessJson: guessedWord, chosen: chosenWord }
         const options = {
           method: 'POST',
@@ -330,9 +359,9 @@ const App = {
         const colours = await response.json()
         return colours
       }
-
-      function revealFeedback (colours) {
-        const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes
+      // the function below used to be much further down( abovecheck current row) in the code, I have moved it up
+      function revealFeedback (colours, feedbackRow) {
+        const currentTiles = document.querySelector('#board1Row-' + feedbackRow).childNodes
         currentTiles.forEach((tile, index) => {
           setTimeout(() => {
             tile.classList.add('flip') // (causes flip animation)
@@ -353,9 +382,22 @@ const App = {
           wordIsValid(guess).then(isValid => {
             if (!isValid) {
               feedbackForGuess('Invalid Word')
-              // delete letters in the row
+           
             } else {
-              requestFeedback().then((colours) => revealFeedback(colours))
+              const feedbackRow = currentRow
+              requestFeedback().then((colours) => {
+                revealFeedback(colours, feedbackRow)
+             
+                const data = {
+                  myRole: App.myRole,
+                  gameId: App.gameId,
+                  colours,
+                  row: feedbackRow
+                }
+                IO.socket.emit('revealColours', data)// so other players can know aswell
+
+              
+              })
               const options = {
                 method: 'POST',
 
@@ -364,7 +406,7 @@ const App = {
                 },
                 body: JSON.stringify(guess)
               }
-              // const hostWord = chosenWord
+           
 
               fetch('/word/isWordOfTheDay', options)
                 .then((res) => res.json())
@@ -381,6 +423,12 @@ const App = {
                   } else {
                     if (currentRow === 5) {
                       feedbackForGuess('Try again tomorrow')
+                      if(chosenWord.length===0){
+                      fetch('/word/revealWord')
+                  .then((response)=>response.json())
+                  .then((data)=> (
+                    messageContainer.append('\n The correct answer is: ',data.toUpperCase(),'. ')
+                    ))}else{messageContainer.append('\n The correct answer is: ',chosenWord.toUpperCase(),'. ')}
                       isGameEnded = true
                       return
                     }
@@ -449,21 +497,24 @@ const App = {
 
     onJoinClick: function () {
       console.log('Clicked "Join A Game"')
+      numberPlayers += 1
+      console.log('numberPlayers ' + numberPlayers)
       App.gameArea.innerHTML = App.templateJoinGame
     },
 
     onPlayerStartClick: function () {
       console.log('Player clicked "Start"')
       // collect data to send to the server
+      App.myRole = 'Player'
       const data = {
-        gameId: +(document.getElementById('inputGameId').value)
-        // playerName: document.getElementById('inputPlayerName').value || 'anon'
+        gameId: +(document.getElementById('inputGameId').value),
+        nplayers: numberPlayers
+  
       }
       console.log('chosen word:' + chosenWord)
-      App.myRole = 'Player'
-      // Send the gameId and playerName to the server
+
       IO.socket.emit('playerJoinGame', data)
-      // App.Player.myName = data.playerName
+
     },
 
     updateWaitingScreen: function (data) {
@@ -473,21 +524,44 @@ const App = {
       if (IO.socket.id === data.mySocketId) {
         App.myRole = 'Player'
         App.gameId = data.gameId
+        console.log('in player updatescreen data.nplayers;' + data.nplayers + 'App.players3' + App.players3)
+        if (data.nplayers === 2 && data.players3) {
+          App.myRole = 'Player2'
+        }
       }
+      console.log('player myrole: ' + App.myRole)
     },
 
     declareWinner: function (data) {
       console.log('Winner2 is' + data.myRole)
       const messageContainer = document.querySelector('.messageContainer')
-      const text = data.myRole + ' Won!'
+      const text = data.myRole + ' has guessed the word correctly!'
       messageContainer.append(text)
+    },
+
+    revealFeedback: function (colours, feedbackRow) {
+      const currentTiles = document.querySelector('#board2Row-' + feedbackRow).childNodes
+      currentTiles.forEach((tile, index) => {
+        setTimeout(() => {
+          tile.classList.add('flip') // (causes flip animation)
+          tile.classList.add(colours[index])// asign each tile to the approriate colour class to change its colour
+        }, 300 * index)// ensure they dont all flip and change colour  at the same time, Higher indexes executed after more time
+      })
+    },
+
+    displayColours: function (data) {
+      console.log('in display colours, my role is ' + data.myRole)
+      if (data.myRole === 'Host') {
+        console.log('colours revealed from ' + data.myRole + 's last Turn')
+        this.revealFeedback(data.colours, data.row)
+      }
     },
 
     displayGame: function (hostData) {
       App.Player.hostSocketId = hostData.mySocketId
 
       App.gameArea.innerHTML = App.playerGame
-      // IO.socket.emit('hostCountdownFinished', App.gameId)
+
 
       const messageContainer = document.querySelector('.messageContainer')
       const keyboard = document.querySelector('.keyContainer')
@@ -539,12 +613,12 @@ const App = {
         // Loop through each row and each tile to create the board
         boardArray.forEach((boardRow, boardRowIndex) => {
           const rowElement = document.createElement('div')
-          rowElement.setAttribute('id', 'boardRow-' + boardRowIndex)
+          rowElement.setAttribute('id', 'board1Row-' + boardRowIndex)
           boardRow.forEach((tile, tileIndex) => {
             const tileElement = document.createElement('div')
             tileElement.setAttribute(
               'id',
-              'boardRow-' + boardRowIndex + '-tile-' + tileIndex
+              'board1Row-' + boardRowIndex + '-tile-' + tileIndex
             )
             tileElement.classList.add('tile')
             rowElement.append(tileElement)
@@ -556,12 +630,12 @@ const App = {
         // Loop through each row and each tile to create the board
         boardArray.forEach((boardRow, boardRowIndex) => {
           const rowElement = document.createElement('div')
-          rowElement.setAttribute('id', 'boardRow-' + boardRowIndex)
+          rowElement.setAttribute('id', 'board2Row-' + boardRowIndex)
           boardRow.forEach((tile, tileIndex) => {
             const tileElement = document.createElement('div')
             tileElement.setAttribute(
               'id',
-              'boardRow-' + boardRowIndex + '-tile-' + tileIndex
+              'board2Row-' + boardRowIndex + '-tile-' + tileIndex
             )
             tileElement.classList.add('tile')
             rowElement.append(tileElement)
@@ -581,7 +655,7 @@ const App = {
         // to ensure we only enter 5 letters in one row
         if (currentTile < 5 && currentRow < 6) {
           const tile = document.getElementById(
-            'boardRow-' + currentRow + '-tile-' + currentTile
+            'board1Row-' + currentRow + '-tile-' + currentTile
           )
           tile.textContent = letter
           boardArray[currentRow][currentTile] = letter
@@ -598,7 +672,7 @@ const App = {
       function removeLetter () {
         if (currentTile > 0) {
           currentTile--
-          const tile = document.getElementById('boardRow-' + currentRow + '-tile-' + currentTile)
+          const tile = document.getElementById('board1Row-' + currentRow + '-tile-' + currentTile)
           tile.textContent = ''
           boardArray[currentRow][currentTile] = ''
         }
@@ -620,7 +694,7 @@ const App = {
       }
 
       const requestFeedback = async () => {
-        const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes
+        const currentTiles = document.querySelector('#board1Row-' + currentRow).childNodes
         const guessedWord = []
         currentTiles.forEach(tile => {
           guessedWord.push(tile.getAttribute('data'))
@@ -641,8 +715,8 @@ const App = {
         return colours
       }
 
-      function revealFeedback (colours) {
-        const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes
+      function revealFeedback (colours, feedbackRow) {
+        const currentTiles = document.querySelector('#board1Row-' + feedbackRow).childNodes
         currentTiles.forEach((tile, index) => {
           setTimeout(() => {
             tile.classList.add('flip') // (causes flip animation)
@@ -664,7 +738,21 @@ const App = {
               feedbackForGuess('Invalid Word')
               // delete letters in the row
             } else {
-              requestFeedback().then((colours) => revealFeedback(colours))
+              const feedbackRow = currentRow// ensures it wont change before callbacl complete
+              requestFeedback().then((colours) => {
+                revealFeedback(colours, feedbackRow)
+
+                const data = {
+                  myRole: App.myRole,
+                  gameId: App.gameId,
+                  colours,
+                  row: feedbackRow
+                }
+                IO.socket.emit('revealColours', data)// so other players can know aswell
+
+
+              })
+
               const options = {
                 method: 'POST',
 
@@ -689,6 +777,9 @@ const App = {
                   } else {
                     if (currentRow === 5) {
                       feedbackForGuess('Try again tomorrow')
+                      fetch('/word/revealWord')
+                  .then((response)=>response.json())
+                  .then((data)=> (messageContainer.append('The correct answer is: ',data.toUpperCase(),'. ')))
                       isGameEnded = true
                       return
                     }
@@ -750,5 +841,6 @@ const App = {
 
 }
 let chosenWord = ''
+let numberPlayers = 0
 IO.init()
 App.init()
