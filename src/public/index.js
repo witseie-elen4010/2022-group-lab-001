@@ -1,7 +1,10 @@
 'use strict'
 
+
 const messageContainer = document.querySelector('.messageContainer')
 const keyboard = document.querySelector('.keyContainer')
+const logModal = document.querySelector('.logs')
+
 let isGameEnded = false
 const tileDisplay = document.querySelector('.tileContainer')
 const boardArray = [
@@ -45,7 +48,22 @@ const keys = [
   'Backspace'
 ]
 
-function generateBoard () {
+function logActions(action) {
+  // console.log(action)
+  const options = {
+    method: 'POST',
+
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(action)
+  }
+  // console.log(options)
+  fetch('/actions/addAction', options)
+
+}
+
+function generateBoard() {
   // Loop through each row and each tile to create the board
   boardArray.forEach((boardRow, boardRowIndex) => {
     const rowElement = document.createElement('div')
@@ -62,13 +80,13 @@ function generateBoard () {
     tileDisplay.append(rowElement)
   })
 }
-function getCurrentPosition (previousRow, previousTile) {
+function getCurrentPosition(previousRow, previousTile) {
   // for future functionality this must deal with the logic for deleting and element and for moving to the next row
   previousTile++
   return { previousRow, previousTile }
 }
 
-function addLetter (letter) {
+function addLetter(letter) {
   const previousRow = currentRow
   const previousTile = currentTile
   // to ensure we only enter 5 letters in one row
@@ -88,7 +106,7 @@ function addLetter (letter) {
   }
 }
 
-function removeLetter () {
+function removeLetter() {
   if (currentTile > 0) {
     currentTile--
     const tile = document.getElementById('boardRow-' + currentRow + '-tile-' + currentTile)
@@ -97,7 +115,7 @@ function removeLetter () {
   }
 }
 
-async function wordIsValid (guess) {
+async function wordIsValid(guess) {
   const options = {
     method: 'POST',
 
@@ -133,7 +151,7 @@ const requestFeedback = async () => {
   return colours
 }
 
-function revealFeedback (colours) {
+function revealFeedback(colours) {
   const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes
   currentTiles.forEach((tile, index) => {
     setTimeout(() => {
@@ -147,15 +165,17 @@ function revealFeedback (colours) {
   })
 }
 
-function checkCurrentRow () {
+function checkCurrentRow() {
   if (currentTile > 4) {
     const currentGuess = boardArray[currentRow].join('').toLowerCase()
+
     const guess = { guess: currentGuess, chosen: '' }
     wordIsValid(guess).then(isValid => {
       if (!isValid) {
         feedbackForGuess('Invalid Word')
         // delete letters in the row
       } else {
+        logActions({ guess: currentGuess, typeOfAction: 'guess', initiatedBy: 'player' })
         requestFeedback().then((colours) => revealFeedback(colours))
         const options = {
           method: 'POST',
@@ -204,7 +224,7 @@ const handleClick = (letter) => {
     addLetter(letter)
   }
 }
-function generateKeyboard () {
+function generateKeyboard() {
   keys.forEach((key) => {
     const buttonTag = document.createElement('button')
     buttonTag.textContent = key
@@ -215,18 +235,51 @@ function generateKeyboard () {
   })
 }
 
-function activatePhysicalKeyBoard () {
+function activatePhysicalKeyBoard() {
   document.addEventListener('keydown', (event) => {
     const letter = event.key
     if (letter === 'Backspace' || letter === 'Enter') { handleClick(letter) } else if (letter.length === 1) { handleClick(letter.toUpperCase()) }
   })
 }
-function feedbackForGuess (feedback) {
+function feedbackForGuess(feedback) {
   const feedbackElement = document.createElement('p')
   feedbackElement.textContent = feedback
   messageContainer.append(feedbackElement)
   setTimeout(() => messageContainer.removeChild(feedbackElement), 1000)
 }
+function viewLogs() {
+  logModal.innerHTML = ''
+  const logView = document.createElement('div')
+  logModal.append(logView)
+  fetch('/actions/allActions').then((response) => {
+    if (response.ok) {
+      return response.json()
+    } // Return the response parse as JSON
+    else { throw 'Failed to load classlist: response code invalid!' }
+  }).then(data => {
+    data.forEach(element => {
+      const logDiv = document.createElement('div')
+      logDiv.className = 'log-div'
+      const guessPar = document.createElement('p')
+      guessPar.textContent = `Guess: ${element.guess}`
+      const actionPar = document.createElement('p')
+      actionPar.textContent = `Action: ${element.typeOfAction}`
+      const initiatedByPar = document.createElement('p')
+      initiatedByPar.textContent = `Initiated By: ${element.initiatedBy}`
+      const createdAtPar = document.createElement('p')
+      createdAtPar.textContent = `Created at : ${element.createdAt}`
+      logDiv.append(guessPar)
+      logDiv.append(actionPar)
+      logDiv.append(initiatedByPar)
+      logDiv.append(createdAtPar)
+      logView.append(logDiv)
+    })
+
+  })
+}
+
+
+viewLogs()
 generateBoard()
 activatePhysicalKeyBoard()
 generateKeyboard()
