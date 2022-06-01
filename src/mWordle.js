@@ -86,6 +86,6 @@ function letOthersKnowColours (data) {
   // tell all clients progress of most recent players turn
   console.log('colours revealed from ' + data.myRole + 's last Turn' )
   io.sockets.in(data.gameId).emit('revealColours', data)
-  // this.emit('winner', data)
+
 }
 
