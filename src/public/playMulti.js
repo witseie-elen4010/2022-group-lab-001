@@ -168,7 +168,7 @@ const App = {
     declareWinner: function (data) {
       console.log('Winner2 is' + data.myRole)
       const messageContainer = document.querySelector('.messageContainer')
-      const text =  data.myRole + ' Won!'
+      const text =  data.myRole + ' has guessed the word correctly!'
       messageContainer.append(text)
     },
 
@@ -385,8 +385,8 @@ const App = {
                       fetch('/word/revealWord')
                   .then((response)=>response.json())
                   .then((data)=> (
-                    messageContainer.append('\n The correct answer is: ',data.toUpperCase())
-                    ))}else{messageContainer.append('\n The correct answer is: ',chosenWord.toUpperCase())}
+                    messageContainer.append('\n The correct answer is: ',data.toUpperCase(),'. ')
+                    ))}else{messageContainer.append('\n The correct answer is: ',chosenWord.toUpperCase(),'. ')}
                       isGameEnded = true
                       return
                     }
@@ -485,7 +485,7 @@ const App = {
     declareWinner: function (data) {
       console.log('Winner2 is' + data.myRole)
       const messageContainer = document.querySelector('.messageContainer')
-      const text = data.myRole + ' Won!'
+      const text = data.myRole + ' has guessed the word correctly!'
       messageContainer.append(text)
     },
 
@@ -697,7 +697,7 @@ const App = {
                       feedbackForGuess('Try again tomorrow')
                       fetch('/word/revealWord')
                   .then((response)=>response.json())
-                  .then((data)=> (messageContainer.append('The correct answer is: ',data.toUpperCase())))
+                  .then((data)=> (messageContainer.append('The correct answer is: ',data.toUpperCase(),'. ')))
                       isGameEnded = true
                       return
                     }
