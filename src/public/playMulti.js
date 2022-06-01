@@ -69,7 +69,6 @@ const App = {
   players3: false,
   hostWord: '',
 
-
   init: function () {
     App.cacheElements()
     App.showInitScreen()
@@ -97,11 +96,32 @@ const App = {
       App.Host.onCreateClick()
     }
     document.getElementById('btnCreateGame3').onclick = function () {
+      async function wordIsValid (guess) {
+        const options = {
+          method: 'POST',
+
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(guess)
+        }
+        const response = await fetch('/word/wordIsValid', options)
+        const isValid = await response.json()
+
+        return isValid
+      }
       App.players3 = true
       App.hostWord = document.getElementById('hostWord').value
-      chosenWord = App.hostWord
-      console.log('chosen word:' + chosenWord)
-      App.Host.onCreateClick()
+      const checker = { guess: App.hostWord }
+      wordIsValid(checker).then(isValid => {
+        if (!isValid) {
+          window.alert('Please choose a valid word')
+        } else {
+          chosenWord = App.hostWord
+          console.log('chosen word:' + chosenWord)
+          App.Host.onCreateClick()
+        }
+      })
     }
     document.getElementById('btnJoinGame').onclick = function () {
       document.getElementById('btnStart').style.display = 'block'
@@ -177,7 +197,7 @@ const App = {
     declareWinner: function (data) {
       console.log('Winner2 is' + data.myRole)
       const messageContainer = document.querySelector('.messageContainer')
-      const text =  data.myRole + ' has guessed the word correctly!'
+      const text = data.myRole + ' has guessed the word correctly!'
       messageContainer.append(text)
     },
 
@@ -382,12 +402,11 @@ const App = {
           wordIsValid(guess).then(isValid => {
             if (!isValid) {
               feedbackForGuess('Invalid Word')
-           
             } else {
               const feedbackRow = currentRow
               requestFeedback().then((colours) => {
                 revealFeedback(colours, feedbackRow)
-             
+
                 const data = {
                   myRole: App.myRole,
                   gameId: App.gameId,
@@ -395,8 +414,6 @@ const App = {
                   row: feedbackRow
                 }
                 IO.socket.emit('revealColours', data)// so other players can know aswell
-
-              
               })
               const options = {
                 method: 'POST',
@@ -406,7 +423,7 @@ const App = {
                 },
                 body: JSON.stringify(guess)
               }
-           
+
 
               fetch('/word/isWordOfTheDay', options)
                 .then((res) => res.json())
@@ -423,12 +440,13 @@ const App = {
                   } else {
                     if (currentRow === 5) {
                       feedbackForGuess('Try again tomorrow')
-                      if(chosenWord.length===0){
-                      fetch('/word/revealWord')
-                  .then((response)=>response.json())
-                  .then((data)=> (
-                    messageContainer.append('\n The correct answer is: ',data.toUpperCase(),'. ')
-                    ))}else{messageContainer.append('\n The correct answer is: ',chosenWord.toUpperCase(),'. ')}
+                      if (chosenWord.length === 0) {
+                        fetch('/word/revealWord')
+                          .then((response) => response.json())
+                          .then((data) => (
+                            messageContainer.append('\n The correct answer is: ', data.toUpperCase(), '. ')
+                          )) 
+}else { messageContainer.append('\n The correct answer is: ', chosenWord.toUpperCase(), '. ') }
                       isGameEnded = true
                       return
                     }
@@ -509,12 +527,11 @@ const App = {
       const data = {
         gameId: +(document.getElementById('inputGameId').value),
         nplayers: numberPlayers
-  
+
       }
       console.log('chosen word:' + chosenWord)
 
       IO.socket.emit('playerJoinGame', data)
-
     },
 
     updateWaitingScreen: function (data) {
@@ -561,7 +578,6 @@ const App = {
       App.Player.hostSocketId = hostData.mySocketId
 
       App.gameArea.innerHTML = App.playerGame
-
 
       const messageContainer = document.querySelector('.messageContainer')
       const keyboard = document.querySelector('.keyContainer')
@@ -749,8 +765,6 @@ const App = {
                   row: feedbackRow
                 }
                 IO.socket.emit('revealColours', data)// so other players can know aswell
-
-
               })
 
               const options = {
@@ -778,8 +792,8 @@ const App = {
                     if (currentRow === 5) {
                       feedbackForGuess('Try again tomorrow')
                       fetch('/word/revealWord')
-                  .then((response)=>response.json())
-                  .then((data)=> (messageContainer.append('The correct answer is: ',data.toUpperCase(),'. ')))
+                        .then((response) => response.json())
+                        .then((data) => (messageContainer.append('The correct answer is: ', data.toUpperCase(), '. ')))
                       isGameEnded = true
                       return
                     }
