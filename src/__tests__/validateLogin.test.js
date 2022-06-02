@@ -8,6 +8,10 @@ const loginController = require('../controllers/loginController')
 const bodyParser = require('body-parser')
 const router = require('../routes/loginRoutes')
 
+// in-memory mock database
+const db = require('../testDatabase')
+const User = require('../models/user')
+
 const app = express()
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -27,24 +31,6 @@ const validLoginDetails1 = {
   password: validMockPassword1
 }
 
-// helper function to check if email exists
-const emailExists = async (user, existingUsers) => {
-  if (existingUsers.length === 0) return false
-
-  const existingUser = existingUsers.find(existingUser => existingUser.email === user.email)
-  if (!existingUser) return false
-  return true
-}
-
-// helper function to check if user exists (both username and password match)
-const userExists = async (user, existingUsers) => {
-  if (!await emailExists(user, existingUsers)) return false
-  const existingUser = existingUsers.find(existingUser => existingUser.email === user.email)
-  return await bcrypt.compare(user.password, existingUser.password)
-}
-
-// declaring this variable here so the same one is used in the 'valid' case and the 'email already used' case
-
 describe('When making a request to /signup', () => {
   it('should save the user\'s details and hash the password if signup details are valid', async () => {
     const response = await request(app)
@@ -53,10 +39,9 @@ describe('When making a request to /signup', () => {
       .set('Accept', 'application/json')
 
     expect(response.statusCode).toBe(200)
-    const users = loginController.getUsers()
-    expect(users.length).toBeGreaterThan(0)
-    const user = users.find(user => user.email === validSignupDetails1.email)
-    expect(user).toBeDefined()
+    // check if user is in database
+    const user = await mongoose
+      .expect(user).toBeDefined()
     expect(await bcrypt.compare(validSignupDetails1.password, user.password)).toBe(true)
   })
 
