@@ -5,7 +5,7 @@ const app = express()
 const router = require('../routes/actionRoutes')
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
-const db = require("./testDatabase");
+const db = require("../testDatabase");
 const Action = require('../models/actions')
 
 app.use('/', router)
