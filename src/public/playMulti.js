@@ -457,6 +457,14 @@ const App = {
           console.log('guess = ' + guess.guess + ' chosen = ' + guess.chosen)
           wordIsValid(guess).then(isValid => {
             if (!isValid) {
+              const currentDate = new Date()
+              const cookieObject = document.cookie
+                .split(';')
+                .map(cookie => cookie.split('='))
+                .reduce((accumulator, [key, value]) => ({ ...accumulator, [key.trim()]: decodeURIComponent(value) }), {})
+              logActions({
+                guess: currentGuess, typeOfAction: 'invalidguess', initiatedBy: cookieObject.email, timeStamp: currentDate.toLocaleString()
+              })
               feedbackForGuess('Invalid Word')
             } else {
               const currentDate = new Date()
@@ -465,7 +473,7 @@ const App = {
                 .map(cookie => cookie.split('='))
                 .reduce((accumulator, [key, value]) => ({ ...accumulator, [key.trim()]: decodeURIComponent(value) }), {})
               logActions({
-                guess: currentGuess, typeOfAction: 'guess', initiatedBy: cookieObject.email, timeStamp: currentDate.toLocaleString()
+                guess: currentGuess, typeOfAction: 'validguess', initiatedBy: cookieObject.email, timeStamp: currentDate.toLocaleString()
               })
 
               const feedbackRow = currentRow
@@ -871,6 +879,14 @@ const App = {
           const guess = { guess: currentGuess, chosen: chosenWord }
           wordIsValid(guess).then(isValid => {
             if (!isValid) {
+              const currentDate = new Date()
+              const cookieObject = document.cookie
+                .split(';')
+                .map(cookie => cookie.split('='))
+                .reduce((accumulator, [key, value]) => ({ ...accumulator, [key.trim()]: decodeURIComponent(value) }), {})
+              logActions({
+                guess: currentGuess, typeOfAction: 'invalidguess', initiatedBy: cookieObject.email, timeStamp: currentDate.toLocaleString()
+              })
               feedbackForGuess('Invalid Word')
               // delete letters in the row
             } else {
@@ -880,7 +896,7 @@ const App = {
                 .map(cookie => cookie.split('='))
                 .reduce((accumulator, [key, value]) => ({ ...accumulator, [key.trim()]: decodeURIComponent(value) }), {})
               logActions({
-                guess: currentGuess, typeOfAction: 'guess', initiatedBy: cookieObject.email, timeStamp: currentDate.toLocaleString()
+                guess: currentGuess, typeOfAction: 'validguess', initiatedBy: cookieObject.email, timeStamp: currentDate.toLocaleString()
               })
               const feedbackRow = currentRow// ensures it wont change before callbacl complete
               requestFeedback().then((colours) => {
