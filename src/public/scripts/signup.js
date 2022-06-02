@@ -50,6 +50,7 @@ signupButton.addEventListener('click', e => {
     .then(response => {
       response.text().then(message => window.alert(message))
       if (response.ok) {
+        document.cookie = `email=${signupDetails.email};path=/`
         window.location.href = '../views/index'
       }
       // else {
