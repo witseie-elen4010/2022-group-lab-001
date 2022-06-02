@@ -14,8 +14,13 @@ const actionSchema = new Schema({
     initiatedBy: {
         type: String,
         required: [true, 'The initiatedBy field is missing']
+    },
+    timeStamp: {
+        type: String,
+        required: true
     }
-}, { timestamps: true })
+
+})
 
 const Action = mongoose.model('Action', actionSchema)
 module.exports = Action

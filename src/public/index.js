@@ -175,7 +175,10 @@ function checkCurrentRow() {
         feedbackForGuess('Invalid Word')
         // delete letters in the row
       } else {
-        logActions({ guess: currentGuess, typeOfAction: 'guess', initiatedBy: 'player' })
+        const currentDate = new Date()
+        logActions({
+          guess: currentGuess, typeOfAction: 'guess', initiatedBy: 'player', timeStamp: currentDate.toUTCString()
+        })
         let feedbackRow = currentRow//prevents row from changing before callback called
         requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
         const options = {
@@ -272,7 +275,7 @@ function viewLogs() {
       const initiatedByPar = document.createElement('p')
       initiatedByPar.textContent = `Initiated By: ${element.initiatedBy}`
       const createdAtPar = document.createElement('p')
-      createdAtPar.textContent = `Created at : ${element.createdAt}`
+      createdAtPar.textContent = `Created at : ${element.timeStamp}`
       logDiv.append(guessPar)
       logDiv.append(actionPar)
       logDiv.append(initiatedByPar)

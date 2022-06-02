@@ -24,8 +24,10 @@ afterAll(async () => {
 });
 
 describe('When adding an action to the database', () => {
+    let currentDate = new Date()
+    currentDate = currentDate.toUTCString()
     it('it gets saved to the database', async () => {
-        const body = { guess: 'hello', typeOfAction: 'guess', initiatedBy: 'Ryan' }
+        const body = { guess: 'hello', typeOfAction: 'guess', initiatedBy: 'Ryan', timeStamp: currentDate }
         const action = new Action(body)
         const savedAction = await action.save()
         const actions = await Action.findById(savedAction._id)
@@ -36,8 +38,10 @@ describe('When adding an action to the database', () => {
 })
 
 describe('When adding an action in the incorrect format to the database', () => {
+    let currentDate = new Date()
+    currentDate = currentDate.toUTCString()
     it('An error is thrown when the guess field is missing', async () => {
-        const body = { typeOfAction: 'guess', initiatedBy: 'Ryan' }
+        const body = { typeOfAction: 'guess', initiatedBy: 'Ryan', timeStamp: currentDate }
         const action = new Action(body)
         let error = await action.validateSync();
         expect(error.errors['guess'].message).toBe('The guess field is missing')
@@ -46,14 +50,16 @@ describe('When adding an action in the incorrect format to the database', () => 
     })
 
     it('An error is thrown when the initiatedBy field is missing', async () => {
-        const body = { guess: 'hello', typeOfAction: 'guess' }
+        const body = { guess: 'hello', typeOfAction: 'guess', timeStamp: currentDate }
         const action = new Action(body)
         let error = await action.validateSync();
         expect(error.errors['initiatedBy'].message).toBe('The initiatedBy field is missing')
     })
 
     it('An error is thrown when the typeOfAction field is missing', async () => {
-        const body = { guess: 'hello', initiatedBy: 'Benjy' }
+        const body = {
+            guess: 'hello', initiatedBy: 'Benjy', timeStamp: currentDate
+        }
         const action = new Action(body)
         let error = await action.validateSync();
         expect(error.errors['typeOfAction'].message).toBe('The typeOfAction field is missing')
