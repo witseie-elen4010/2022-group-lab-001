@@ -151,8 +151,8 @@ const requestFeedback = async () => {
   return colours
 }
 
-function revealFeedback(colours) {
-  const currentTiles = document.querySelector('#boardRow-' + currentRow).childNodes
+function revealFeedback(colours, feedbackRow) {
+  const currentTiles = document.querySelector('#boardRow-' + feedbackRow).childNodes
   currentTiles.forEach((tile, index) => {
     setTimeout(() => {
       tile.classList.add('flip') // (causes flip animation)
@@ -176,7 +176,8 @@ function checkCurrentRow() {
         // delete letters in the row
       } else {
         logActions({ guess: currentGuess, typeOfAction: 'guess', initiatedBy: 'player' })
-        requestFeedback().then((colours) => revealFeedback(colours))
+        let feedbackRow = currentRow//prevents row from changing before callback called
+        requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
         const options = {
           method: 'POST',
 
@@ -195,6 +196,10 @@ function checkCurrentRow() {
             } else {
               if (currentRow === 5) {
                 feedbackForGuess('Try again tomorrow')
+                fetch('/word/revealWord')
+                  .then((response) => response.json())
+                  .then((data) => (messageContainer.append('Try again tomorrow :) !!! Today\'s word was: ', data.toUpperCase())))
+
                 isGameEnded = true
                 return
               }
@@ -224,7 +229,7 @@ const handleClick = (letter) => {
     addLetter(letter)
   }
 }
-function generateKeyboard() {
+function activateOnscreenKeyBoard() {
   keys.forEach((key) => {
     const buttonTag = document.createElement('button')
     buttonTag.textContent = key
@@ -245,7 +250,7 @@ function feedbackForGuess(feedback) {
   const feedbackElement = document.createElement('p')
   feedbackElement.textContent = feedback
   messageContainer.append(feedbackElement)
-  setTimeout(() => messageContainer.removeChild(feedbackElement), 1000)
+  setTimeout(() => messageContainer.removeChild(feedbackElement), 3000)
 }
 function viewLogs() {
   logModal.innerHTML = ''
@@ -281,5 +286,6 @@ function viewLogs() {
 
 viewLogs()
 generateBoard()
+
 activatePhysicalKeyBoard()
-generateKeyboard()
+activateOnscreenKeyBoard()

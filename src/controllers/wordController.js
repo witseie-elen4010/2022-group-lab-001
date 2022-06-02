@@ -18,7 +18,11 @@ const assignColours = (request, response) => {
   guessedWord.forEach((letter, index) => { // first assign them all grey
     colours[index] = 'grey-block'
   })
-
+ guessedWord.forEach((letter, index) => {
+    if (checkWordle.includes(letter)) {
+      colours[index] = 'blue-block'
+    }
+  })
   guessedWord.forEach((letter, index) => {
     if (letter === wordOfTheDay[index]) {
       colours[index] = 'green-block'
@@ -26,12 +30,7 @@ const assignColours = (request, response) => {
     }
   })
 
-  guessedWord.forEach((letter, index) => {
-    if (checkWordle.includes(letter)) {
-      colours[index] = 'blue-block'
-      checkWordle = checkWordle.replace(letter, '')// esnures we wont check letters that have already been dealt with
-    }
-  })
+ 
 
   response.json(colours)
 }
@@ -66,11 +65,16 @@ const wordIsValid = (request, response) => {
   response.json(validWords.includes(currentGuess))
 }
 
+const revealWord=(request, response)=>{
+  response.json(getWordOfTheDay())
+}
+
 module.exports = {
   getWordOfTheDay,
   getRandomIndexBasedOnDate,
   wordIsValid,
   isWordOfTheDay,
-  assignColours
+  assignColours,
+  revealWord
 
 }
