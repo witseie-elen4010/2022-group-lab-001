@@ -179,8 +179,6 @@ function checkCurrentRow() {
         logActions({
           guess: currentGuess, typeOfAction: 'guess', initiatedBy: 'player', timeStamp: currentDate.toLocaleString()
         })
-        let feedbackRow = currentRow//prevents row from changing before callback called
-        requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
         const options = {
           method: 'POST',
 
@@ -195,10 +193,14 @@ function checkCurrentRow() {
             console.log(wordOfTheDay)
             if (wordOfTheDay === 'word of the day') {
               feedbackForGuess('Correct')
+              let feedbackRow = currentRow//prevents row from changing before callback called
+              requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
               isGameEnded = true
             } else {
               if (currentRow === 5) {
                 feedbackForGuess('Try again tomorrow')
+                let feedbackRow = currentRow//prevents row from changing before callback called
+                requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
                 fetch('/word/revealWord')
                   .then((response) => response.json())
                   .then((data) => (messageContainer.append('Try again tomorrow :) !!! Today\'s word was: ', data.toUpperCase())))
@@ -209,6 +211,8 @@ function checkCurrentRow() {
 
               if (currentRow < 5) {
                 feedbackForGuess('Try again')
+                let feedbackRow = currentRow//prevents row from changing before callback called
+                requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
                 currentRow = currentRow + 1
                 currentTile = 0
               }
@@ -244,7 +248,7 @@ function activateOnscreenKeyBoard() {
 }
 
 function activatePhysicalKeyBoard() {
-  document.addEventListener('keyup', (event) => {
+  document.addEventListener('keydown', (event) => {
     const letter = event.key
     if (letter === 'Backspace' || letter === 'Enter') { handleClick(letter) } else if (letter.length === 1) { handleClick(letter.toUpperCase()) }
   })
