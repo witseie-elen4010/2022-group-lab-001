@@ -177,7 +177,7 @@ function checkCurrentRow() {
       } else {
         const currentDate = new Date()
         logActions({
-          guess: currentGuess, typeOfAction: 'guess', initiatedBy: 'player', timeStamp: currentDate.toUTCString()
+          guess: currentGuess, typeOfAction: 'guess', initiatedBy: 'player', timeStamp: currentDate.toLocaleString()
         })
         let feedbackRow = currentRow//prevents row from changing before callback called
         requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
