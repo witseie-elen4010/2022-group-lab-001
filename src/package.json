@@ -36,6 +36,7 @@
     "enzyme": "^3.11.0",
     "jest": "^28.1.0",
     "jsdom": "^19.0.0",
+    "mongodb-memory-server": "^8.6.0",
     "node-mocks-http": "^1.11.0",
     "standard": "^17.0.0",
     "supertest": "^6.2.3"
