@@ -244,7 +244,7 @@ function activateOnscreenKeyBoard() {
 }
 
 function activatePhysicalKeyBoard() {
-  document.addEventListener('keydown', (event) => {
+  document.addEventListener('keyup', (event) => {
     const letter = event.key
     if (letter === 'Backspace' || letter === 'Enter') { handleClick(letter) } else if (letter.length === 1) { handleClick(letter.toUpperCase()) }
   })

@@ -446,7 +446,7 @@ const App = {
                           .then((data) => (
                             messageContainer.append('\n The correct answer is: ', data.toUpperCase(), '. ')
                           )) 
-}else { messageContainer.append('\n The correct answer is: ', chosenWord.toUpperCase(), '. ') }
+                          }else { messageContainer.append('\n The correct answer is: ', chosenWord.toUpperCase(), '. ') }
                       isGameEnded = true
                       return
                     }
@@ -834,7 +834,7 @@ const App = {
       }
 
       function activatePhysicalKeyBoard () {
-        document.addEventListener('keydown', (event) => {
+        document.addEventListener('keyup', (event) => {
           const letter = event.key
           if (letter === 'Backspace' || letter === 'Enter') { handleClick(letter) } else if (letter.length === 1) { handleClick(letter.toUpperCase()) }
         })
