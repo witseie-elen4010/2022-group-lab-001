@@ -5,7 +5,7 @@ const Action = require('../models/actions')
 router.post('/addAction', (req, res) => {
     const action = new Action(req.body)
     action.save()
-    // res.send('ok')
+    res.send(action)
 })
 
 router.get('/allActions', (req, res) => {
