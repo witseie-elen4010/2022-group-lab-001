@@ -1,6 +1,5 @@
 'use strict'
 
-
 const messageContainer = document.querySelector('.messageContainer')
 const keyboard = document.querySelector('.keyContainer')
 const logModal = document.querySelector('.logs')
@@ -48,8 +47,8 @@ const keys = [
   'Backspace'
 ]
 
-function logActions(action) {
-  // console.log(action)
+async function logActions(action) {
+  console.log(action)
   const options = {
     method: 'POST',
 
@@ -59,8 +58,10 @@ function logActions(action) {
     body: JSON.stringify(action)
   }
   // console.log(options)
-  fetch('/actions/addAction', options)
-
+  // async function logIt('/actions/addAction'){
+  const response = await fetch('/actions/addAction', options)
+  console.log(response)
+  //  return response
 }
 
 function generateBoard() {
@@ -165,12 +166,16 @@ function revealFeedback(colours, feedbackRow) {
   })
 }
 
-function checkCurrentRow() {
+ function checkCurrentRow() {
   if (currentTile > 4) {
     const currentGuess = boardArray[currentRow].join('').toLowerCase()
 
     const guess = { guess: currentGuess, chosen: '' }
     wordIsValid(guess).then(isValid => {
+      const currentDate = new Date()
+      logActions({
+        guess: currentGuess, typeOfAction: 'guess', initiatedBy: 'player', timeStamp: currentDate.toLocaleString()
+      })
       if (!isValid) {
         feedbackForGuess('Invalid Word')
         // delete letters in the row
@@ -179,7 +184,8 @@ function checkCurrentRow() {
         logActions({
           guess: currentGuess, typeOfAction: 'guess', initiatedBy: 'player', timeStamp: currentDate.toLocaleString()
         })
-        let feedbackRow = currentRow//prevents row from changing before callback called
+        console.log('word is valid')
+        const feedbackRow = currentRow// prevents row from changing before callback called
         requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
         const options = {
           method: 'POST',
@@ -195,10 +201,16 @@ function checkCurrentRow() {
             console.log(wordOfTheDay)
             if (wordOfTheDay === 'word of the day') {
               feedbackForGuess('Correct')
+              let feedbackRow = currentRow//prevents row from changing before callback called
+              requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
               isGameEnded = true
             } else {
               if (currentRow === 5) {
+                console.log('current row = 5')
+
                 feedbackForGuess('Try again tomorrow')
+                let feedbackRow = currentRow//prevents row from changing before callback called
+                requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
                 fetch('/word/revealWord')
                   .then((response) => response.json())
                   .then((data) => (messageContainer.append('Try again tomorrow :) !!! Today\'s word was: ', data.toUpperCase())))
@@ -209,6 +221,8 @@ function checkCurrentRow() {
 
               if (currentRow < 5) {
                 feedbackForGuess('Try again')
+                let feedbackRow = currentRow//prevents row from changing before callback called
+                requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
                 currentRow = currentRow + 1
                 currentTile = 0
               }
@@ -282,10 +296,8 @@ function viewLogs() {
       logDiv.append(createdAtPar)
       logView.append(logDiv)
     })
-
   })
 }
-
 
 viewLogs()
 generateBoard()

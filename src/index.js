@@ -12,7 +12,6 @@ const actionsRouter = require('./routes/actionRoutes')
 const loginController = require('./routes/loginRoutes')
 const wordRouter = require('./routes/wordRoutes')
 
-
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 // app.use(express.json({ limit: '1mb' }))

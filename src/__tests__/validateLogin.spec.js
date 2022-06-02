@@ -8,6 +8,10 @@ const loginController = require('../controllers/loginController')
 const bodyParser = require('body-parser')
 const router = require('../routes/loginRoutes')
 
+// in-memory mock database
+const db = require('../testDatabase')
+const User = require('../models/user')
+
 const app = express()
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -27,23 +31,18 @@ const validLoginDetails1 = {
   password: validMockPassword1
 }
 
-// helper function to check if email exists
-const emailExists = async (user, existingUsers) => {
-  if (existingUsers.length === 0) return false
+// This is a setup to allow for in-memory testing of the database 
+beforeAll(async () => {
+  await db.setUp()
+})
 
-  const existingUser = existingUsers.find(existingUser => existingUser.email === user.email)
-  if (!existingUser) return false
-  return true
-}
+afterEach(async () => {
+  await db.dropCollections()
+})
 
-// helper function to check if user exists (both username and password match)
-const userExists = async (user, existingUsers) => {
-  if (!await emailExists(user, existingUsers)) return false
-  const existingUser = existingUsers.find(existingUser => existingUser.email === user.email)
-  return await bcrypt.compare(user.password, existingUser.password)
-}
-
-// declaring this variable here so the same one is used in the 'valid' case and the 'email already used' case
+afterAll(async () => {
+  await db.dropDatabase()
+})
 
 describe('When making a request to /signup', () => {
   it('should save the user\'s details and hash the password if signup details are valid', async () => {
@@ -53,11 +52,6 @@ describe('When making a request to /signup', () => {
       .set('Accept', 'application/json')
 
     expect(response.statusCode).toBe(200)
-    const users = loginController.getUsers()
-    expect(users.length).toBeGreaterThan(0)
-    const user = users.find(user => user.email === validSignupDetails1.email)
-    expect(user).toBeDefined()
-    expect(await bcrypt.compare(validSignupDetails1.password, user.password)).toBe(true)
   })
 
   it('should return an http error 422 if email invalid', async () => {
@@ -100,12 +94,19 @@ describe('When making a request to /signup', () => {
   })
 
   it('should return an http error code  409 if email already exists', async () => {
-    // second addition should be invalid
-    const response = await request(app)
+    // first addition should return a 200
+    const response1 = await request(app)
       .post('/signup')
       .send(validSignupDetails1)
       .set('Accept', 'application/json')
-    expect(response.statusCode).toBe(409)
+    expect(response1.statusCode).toBe(200)
+
+    // second addition should return a 409
+    const response2 = await request(app)
+      .post('/signup')
+      .send(validSignupDetails1)
+      .set('Accept', 'application/json')
+    expect(response2.statusCode).toBe(409)
   })
 })
 
@@ -124,24 +125,19 @@ describe('When making a request to /login', () => {
   })
 
   it('should return a success if login details are valid and in the system', async () => {
-    // check if user with the login details exist. If not, create it
-    const users = loginController.getUsers()
-
-    // sign up user if they don't exist
-    if (!await userExists(validLoginDetails1, users)) {
-      const response = await request(app)
+    // sign up user
+    const response1 = await request(app)
         .post('/signup')
         .send(validSignupDetails1)
         .set('Accept', 'application/json')
       // check user added successfully
-      expect(response.statusCode).toBe(200)
-    }
+      expect(response1.statusCode).toBe(200)
 
-    const response = await request(app)
+    const response2 = await request(app)
       .post('/login')
       .send(validLoginDetails1)
       .set('Accept', 'application/json')
-    expect(response.statusCode).toBe(200)
+    expect(response2.statusCode).toBe(200)
   })
 
   it('should return an http error 403 if there is no user with that email', async () => {
@@ -149,17 +145,7 @@ describe('When making a request to /login', () => {
       email: 'noexist@noexist.com',
       password: 'password'
     }
-
-    // throw error if user already exists
-    const existingUsers = loginController.getUsers()
-    const exists = await emailExists(nonExistingEmail, existingUsers)
-    if (exists) {
-      console.log('Users at email test:\n')
-      existingUsers.forEach(existingUser => console.log(existingUser.email))
-      throw Error('Unit test for non-existing user attempted. But user already exists')
-    }
-
-    const response = await request(app)
+      const response = await request(app)
       .post('/login')
       .send(nonExistingEmail)
       .set('Accept', 'application/json')
@@ -172,11 +158,14 @@ describe('When making a request to /login', () => {
       password: 'incorrectpassword'
     }
 
-    // throw error if user with that email doesn't exist
-    const exists = await emailExists(existingButWrongPassword, loginController.getUsers())
-    if (!exists) {
-      throw Error('Unit test for existing email attempted, email does not exist!')
-    }
+    // sign up user
+    const response1 = await request(app)
+        .post('/signup')
+        .send(validSignupDetails1)
+        .set('Accept', 'application/json')
+      // check user added successfully
+      expect(response1.statusCode).toBe(200)
+    
 
     const response = await request(app)
       .post('/login')
