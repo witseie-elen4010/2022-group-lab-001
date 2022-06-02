@@ -96,7 +96,7 @@ const App = {
       App.Host.onCreateClick()
     }
     document.getElementById('btnCreateGame3').onclick = function () {
-      async function wordIsValid(guess) {
+      async function wordIsValid (guess) {
         const options = {
           method: 'POST',
 
@@ -229,7 +229,7 @@ const App = {
       IO.socket.emit('tellHostGameStarting', App.gameId)
       const logModal = document.querySelector('.logs')
 
-      function viewLogs() {
+      function viewLogs () {
         console.log('in view logs ')
 
         logModal.innerHTML = ''
@@ -243,7 +243,13 @@ const App = {
             throw 'Failed to load classlist: response code invalid!'
           }
         }).then(data => {
-          data.forEach(element => {
+          const cookieObject = document.cookie
+          .split(';')
+          .map(cookie => cookie.split('='))
+          .reduce((accumulator, [key, value]) => ({ ...accumulator, [key.trim()]: decodeURIComponent(value) }), {})
+          // filter
+          data.filter(datum => datum.initiatedBy === cookieObject.email)
+            .forEach(element => {
             const logDiv = document.createElement('div')
             logDiv.className = 'log-div'
             const guessPar = document.createElement('p')
@@ -312,7 +318,7 @@ const App = {
         'Backspace'
       ]
 
-      function generateBoard() {
+      function generateBoard () {
         // Loop through each row and each tile to create the board
         boardArray.forEach((boardRow, boardRowIndex) => {
           const rowElement = document.createElement('div')
@@ -329,7 +335,7 @@ const App = {
           tileDisplay.append(rowElement)
         })
       }
-      function generateBoard2() {
+      function generateBoard2 () {
         // Loop through each row and each tile to create the board
         boardArray.forEach((boardRow, boardRowIndex) => {
           const rowElement = document.createElement('div')
@@ -346,13 +352,13 @@ const App = {
           tileDisplay2.append(rowElement)
         })
       }
-      function getCurrentPosition(previousRow, previousTile) {
+      function getCurrentPosition (previousRow, previousTile) {
         // for future functionality this must deal with the logic for deleting and element and for moving to the next row
         previousTile++
         return { previousRow, previousTile }
       }
 
-      function addLetter(letter) {
+      function addLetter (letter) {
         const previousRow = currentRow
         const previousTile = currentTile
         // to ensure we only enter 5 letters in one row
@@ -372,7 +378,7 @@ const App = {
         }
       }
 
-      function removeLetter() {
+      function removeLetter () {
         if (currentTile > 0) {
           currentTile--
           const tile = document.getElementById('board1Row-' + currentRow + '-tile-' + currentTile)
@@ -381,7 +387,7 @@ const App = {
         }
       }
 
-      async function wordIsValid(guess) {
+      async function wordIsValid (guess) {
         const options = {
           method: 'POST',
 
@@ -418,7 +424,7 @@ const App = {
         return colours
       }
       // the function below used to be much further down( abovecheck current row) in the code, I have moved it up
-      function revealFeedback(colours, feedbackRow) {
+      function revealFeedback (colours, feedbackRow) {
         const currentTiles = document.querySelector('#board1Row-' + feedbackRow).childNodes
         currentTiles.forEach((tile, index) => {
           setTimeout(() => {
@@ -431,7 +437,7 @@ const App = {
           }, 300 * index)// ensure they dont all flip and change colour  at the same time, Higher indexes executed after more time
         })
       }
-      function logActions(action) {
+      function logActions (action) {
         // console.log(action)
         const options = {
           method: 'POST',
@@ -444,7 +450,7 @@ const App = {
         // console.log(options)
         fetch('/actions/addAction', options)
       }
-      function checkCurrentRow() {
+      function checkCurrentRow () {
         if (currentTile > 4) {
           const currentGuess = boardArray[currentRow].join('').toLowerCase()
           const guess = { guess: currentGuess, chosen: chosenWord }
@@ -454,8 +460,12 @@ const App = {
               feedbackForGuess('Invalid Word')
             } else {
               const currentDate = new Date()
+              const cookieObject = document.cookie
+                .split(';')
+                .map(cookie => cookie.split('='))
+                .reduce((accumulator, [key, value]) => ({ ...accumulator, [key.trim()]: decodeURIComponent(value) }), {})
               logActions({
-                guess: currentGuess, typeOfAction: 'guess', initiatedBy: 'player', timeStamp: currentDate.toLocaleString()
+                guess: currentGuess, typeOfAction: 'guess', initiatedBy: cookieObject.email, timeStamp: currentDate.toLocaleString()
               })
 
               const feedbackRow = currentRow
@@ -478,7 +488,6 @@ const App = {
                 },
                 body: JSON.stringify(guess)
               }
-
 
               fetch('/word/isWordOfTheDay', options)
                 .then((res) => res.json())
@@ -531,7 +540,7 @@ const App = {
           addLetter(letter)
         }
       }
-      function generateKeyboard() {
+      function generateKeyboard () {
         keys.forEach((key) => {
           const buttonTag = document.createElement('button')
           buttonTag.textContent = key
@@ -542,13 +551,13 @@ const App = {
         })
       }
 
-      function activatePhysicalKeyBoard() {
+      function activatePhysicalKeyBoard () {
         document.addEventListener('keydown', (event) => {
           const letter = event.key
           if (letter === 'Backspace' || letter === 'Enter') { handleClick(letter) } else if (letter.length === 1) { handleClick(letter.toUpperCase()) }
         })
       }
-      function feedbackForGuess(feedback) {
+      function feedbackForGuess (feedback) {
         const feedbackElement = document.createElement('p')
         feedbackElement.textContent = feedback
         messageContainer.append(feedbackElement)
@@ -635,9 +644,8 @@ const App = {
       App.gameArea.innerHTML = App.playerGame
       const logModal = document.querySelector('.logs')
 
-      function viewLogs() {
+      function viewLogs () {
         console.log('in view logs ')
-
         logModal.innerHTML = ''
         const logView = document.createElement('div')
         logModal.append(logView)
@@ -649,23 +657,30 @@ const App = {
             throw 'Failed to load classlist: response code invalid!'
           }
         }).then(data => {
-          data.forEach(element => {
-            const logDiv = document.createElement('div')
-            logDiv.className = 'log-div'
-            const guessPar = document.createElement('p')
-            guessPar.textContent = `Guess: ${element.guess}`
-            const actionPar = document.createElement('p')
-            actionPar.textContent = `Action: ${element.typeOfAction}`
-            const initiatedByPar = document.createElement('p')
-            initiatedByPar.textContent = `Initiated By: ${element.initiatedBy}`
-            const createdAtPar = document.createElement('p')
-            createdAtPar.textContent = `Created at : ${element.timeStamp}`
-            logDiv.append(guessPar)
-            logDiv.append(actionPar)
-            logDiv.append(initiatedByPar)
-            logDiv.append(createdAtPar)
-            logView.append(logDiv)
-          })
+          // extract email from cookie
+          const cookieObject = document.cookie
+            .split(';')
+            .map(cookie => cookie.split('='))
+            .reduce((accumulator, [key, value]) => ({ ...accumulator, [key.trim()]: decodeURIComponent(value) }), {})
+          // filter
+          data.filter(datum => datum.initiatedBy === cookieObject.email)
+            .forEach(element => {
+              const logDiv = document.createElement('div')
+              logDiv.className = 'log-div'
+              const guessPar = document.createElement('p')
+              guessPar.textContent = `Guess: ${element.guess}`
+              const actionPar = document.createElement('p')
+              actionPar.textContent = `Action: ${element.typeOfAction}`
+              const initiatedByPar = document.createElement('p')
+              initiatedByPar.textContent = `Initiated By: ${element.initiatedBy}`
+              const createdAtPar = document.createElement('p')
+              createdAtPar.textContent = `Created at : ${element.timeStamp}`
+              logDiv.append(guessPar)
+              logDiv.append(actionPar)
+              logDiv.append(initiatedByPar)
+              logDiv.append(createdAtPar)
+              logView.append(logDiv)
+            })
         })
       }
       const messageContainer = document.querySelector('.messageContainer')
@@ -718,7 +733,7 @@ const App = {
         'Backspace'
       ]
 
-      function generateBoard() {
+      function generateBoard () {
         // Loop through each row and each tile to create the board
         boardArray.forEach((boardRow, boardRowIndex) => {
           const rowElement = document.createElement('div')
@@ -735,7 +750,7 @@ const App = {
           tileDisplay.append(rowElement)
         })
       }
-      function generateBoard2() {
+      function generateBoard2 () {
         // Loop through each row and each tile to create the board
         boardArray.forEach((boardRow, boardRowIndex) => {
           const rowElement = document.createElement('div')
@@ -752,13 +767,13 @@ const App = {
           tileDisplay2.append(rowElement)
         })
       }
-      function getCurrentPosition(previousRow, previousTile) {
+      function getCurrentPosition (previousRow, previousTile) {
         // for future functionality this must deal with the logic for deleting and element and for moving to the next row
         previousTile++
         return { previousRow, previousTile }
       }
 
-      function addLetter(letter) {
+      function addLetter (letter) {
         const previousRow = currentRow
         const previousTile = currentTile
         // to ensure we only enter 5 letters in one row
@@ -778,7 +793,7 @@ const App = {
         }
       }
 
-      function removeLetter() {
+      function removeLetter () {
         if (currentTile > 0) {
           currentTile--
           const tile = document.getElementById('board1Row-' + currentRow + '-tile-' + currentTile)
@@ -787,7 +802,7 @@ const App = {
         }
       }
 
-      async function wordIsValid(guess) {
+      async function wordIsValid (guess) {
         const options = {
           method: 'POST',
 
@@ -824,7 +839,7 @@ const App = {
         return colours
       }
 
-      function revealFeedback(colours, feedbackRow) {
+      function revealFeedback (colours, feedbackRow) {
         const currentTiles = document.querySelector('#board1Row-' + feedbackRow).childNodes
         currentTiles.forEach((tile, index) => {
           setTimeout(() => {
@@ -837,7 +852,7 @@ const App = {
           }, 300 * index)// ensure they dont all flip and change colour  at the same time, Higher indexes executed after more time
         })
       }
-      function logActions(action) {
+      function logActions (action) {
         // console.log(action)
         const options = {
           method: 'POST',
@@ -850,7 +865,7 @@ const App = {
         // console.log(options)
         fetch('/actions/addAction', options)
       }
-      function checkCurrentRow() {
+      function checkCurrentRow () {
         if (currentTile > 4) {
           const currentGuess = boardArray[currentRow].join('').toLowerCase()
           const guess = { guess: currentGuess, chosen: chosenWord }
@@ -860,8 +875,12 @@ const App = {
               // delete letters in the row
             } else {
               const currentDate = new Date()
+              const cookieObject = document.cookie
+                .split(';')
+                .map(cookie => cookie.split('='))
+                .reduce((accumulator, [key, value]) => ({ ...accumulator, [key.trim()]: decodeURIComponent(value) }), {})
               logActions({
-                guess: currentGuess, typeOfAction: 'guess', initiatedBy: 'player', timeStamp: currentDate.toLocaleString()
+                guess: currentGuess, typeOfAction: 'guess', initiatedBy: cookieObject.email, timeStamp: currentDate.toLocaleString()
               })
               const feedbackRow = currentRow// ensures it wont change before callbacl complete
               requestFeedback().then((colours) => {
@@ -931,7 +950,7 @@ const App = {
           addLetter(letter)
         }
       }
-      function generateKeyboard() {
+      function generateKeyboard () {
         keys.forEach((key) => {
           const buttonTag = document.createElement('button')
           buttonTag.textContent = key
@@ -942,13 +961,13 @@ const App = {
         })
       }
 
-      function activatePhysicalKeyBoard() {
+      function activatePhysicalKeyBoard () {
         document.addEventListener('keydown', (event) => {
           const letter = event.key
           if (letter === 'Backspace' || letter === 'Enter') { handleClick(letter) } else if (letter.length === 1) { handleClick(letter.toUpperCase()) }
         })
       }
-      function feedbackForGuess(feedback) {
+      function feedbackForGuess (feedback) {
         const feedbackElement = document.createElement('p')
         feedbackElement.textContent = feedback
         messageContainer.append(feedbackElement)
