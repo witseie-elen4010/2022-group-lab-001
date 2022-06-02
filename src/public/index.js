@@ -47,7 +47,7 @@ const keys = [
   'Backspace'
 ]
 
-async function logActions(action) {
+async function logActions (action) {
   console.log(action)
   const options = {
     method: 'POST',
@@ -64,7 +64,7 @@ async function logActions(action) {
   //  return response
 }
 
-function generateBoard() {
+function generateBoard () {
   // Loop through each row and each tile to create the board
   boardArray.forEach((boardRow, boardRowIndex) => {
     const rowElement = document.createElement('div')
@@ -81,13 +81,13 @@ function generateBoard() {
     tileDisplay.append(rowElement)
   })
 }
-function getCurrentPosition(previousRow, previousTile) {
+function getCurrentPosition (previousRow, previousTile) {
   // for future functionality this must deal with the logic for deleting and element and for moving to the next row
   previousTile++
   return { previousRow, previousTile }
 }
 
-function addLetter(letter) {
+function addLetter (letter) {
   const previousRow = currentRow
   const previousTile = currentTile
   // to ensure we only enter 5 letters in one row
@@ -107,7 +107,7 @@ function addLetter(letter) {
   }
 }
 
-function removeLetter() {
+function removeLetter () {
   if (currentTile > 0) {
     currentTile--
     const tile = document.getElementById('boardRow-' + currentRow + '-tile-' + currentTile)
@@ -116,7 +116,7 @@ function removeLetter() {
   }
 }
 
-async function wordIsValid(guess) {
+async function wordIsValid (guess) {
   const options = {
     method: 'POST',
 
@@ -152,7 +152,7 @@ const requestFeedback = async () => {
   return colours
 }
 
-function revealFeedback(colours, feedbackRow) {
+function revealFeedback (colours, feedbackRow) {
   const currentTiles = document.querySelector('#boardRow-' + feedbackRow).childNodes
   currentTiles.forEach((tile, index) => {
     setTimeout(() => {
@@ -166,24 +166,19 @@ function revealFeedback(colours, feedbackRow) {
   })
 }
 
- function checkCurrentRow() {
+function checkCurrentRow () {
   if (currentTile > 4) {
     const currentGuess = boardArray[currentRow].join('').toLowerCase()
 
     const guess = { guess: currentGuess, chosen: '' }
     wordIsValid(guess).then(isValid => {
-      const currentDate = new Date()
-      logActions({
-        guess: currentGuess, typeOfAction: 'guess', initiatedBy: 'player', timeStamp: currentDate.toLocaleString()
-      })
+      let actionType = ''
       if (!isValid) {
+        actionType = 'invalidguess'
         feedbackForGuess('Invalid Word')
         // delete letters in the row
       } else {
-        const currentDate = new Date()
-        logActions({
-          guess: currentGuess, typeOfAction: 'guess', initiatedBy: 'player', timeStamp: currentDate.toLocaleString()
-        })
+        actionType = 'validguess'
         console.log('word is valid')
         const options = {
           method: 'POST',
@@ -199,7 +194,7 @@ function revealFeedback(colours, feedbackRow) {
             console.log(wordOfTheDay)
             if (wordOfTheDay === 'word of the day') {
               feedbackForGuess('Correct')
-              let feedbackRow = currentRow//prevents row from changing before callback called
+              const feedbackRow = currentRow// prevents row from changing before callback called
               requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
               isGameEnded = true
             } else {
@@ -207,7 +202,7 @@ function revealFeedback(colours, feedbackRow) {
                 console.log('current row = 5')
 
                 feedbackForGuess('Try again tomorrow')
-                let feedbackRow = currentRow//prevents row from changing before callback called
+                const feedbackRow = currentRow// prevents row from changing before callback called
                 requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
                 fetch('/word/revealWord')
                   .then((response) => response.json())
@@ -219,7 +214,7 @@ function revealFeedback(colours, feedbackRow) {
 
               if (currentRow < 5) {
                 feedbackForGuess('Try again')
-                let feedbackRow = currentRow//prevents row from changing before callback called
+                const feedbackRow = currentRow// prevents row from changing before callback called
                 requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
                 currentRow = currentRow + 1
                 currentTile = 0
@@ -227,6 +222,14 @@ function revealFeedback(colours, feedbackRow) {
             }
           })
       }
+      const currentDate = new Date()
+      const cookieObject = document.cookie
+        .split(';')
+        .map(cookie => cookie.split('='))
+        .reduce((accumulator, [key, value]) => ({ ...accumulator, [key.trim()]: decodeURIComponent(value) }), {})
+      logActions({
+        guess: currentGuess, typeOfAction: actionType, initiatedBy: cookieObject.email, timeStamp: currentDate.toLocaleString()
+      })
     })
   }
 }
@@ -244,7 +247,7 @@ const handleClick = (letter) => {
     addLetter(letter)
   }
 }
-function activateOnscreenKeyBoard() {
+function activateOnscreenKeyBoard () {
   keys.forEach((key) => {
     const buttonTag = document.createElement('button')
     buttonTag.textContent = key
@@ -255,19 +258,19 @@ function activateOnscreenKeyBoard() {
   })
 }
 
-function activatePhysicalKeyBoard() {
+function activatePhysicalKeyBoard () {
   document.addEventListener('keydown', (event) => {
     const letter = event.key
     if (letter === 'Backspace' || letter === 'Enter') { handleClick(letter) } else if (letter.length === 1) { handleClick(letter.toUpperCase()) }
   })
 }
-function feedbackForGuess(feedback) {
+function feedbackForGuess (feedback) {
   const feedbackElement = document.createElement('p')
   feedbackElement.textContent = feedback
   messageContainer.append(feedbackElement)
   setTimeout(() => messageContainer.removeChild(feedbackElement), 3000)
 }
-function viewLogs() {
+function viewLogs () {
   logModal.innerHTML = ''
   const logView = document.createElement('div')
   logModal.append(logView)
@@ -277,23 +280,30 @@ function viewLogs() {
     } // Return the response parse as JSON
     else { throw 'Failed to load classlist: response code invalid!' }
   }).then(data => {
-    data.forEach(element => {
-      const logDiv = document.createElement('div')
-      logDiv.className = 'log-div'
-      const guessPar = document.createElement('p')
-      guessPar.textContent = `Guess: ${element.guess}`
-      const actionPar = document.createElement('p')
-      actionPar.textContent = `Action: ${element.typeOfAction}`
-      const initiatedByPar = document.createElement('p')
-      initiatedByPar.textContent = `Initiated By: ${element.initiatedBy}`
-      const createdAtPar = document.createElement('p')
-      createdAtPar.textContent = `Created at : ${element.timeStamp}`
-      logDiv.append(guessPar)
-      logDiv.append(actionPar)
-      logDiv.append(initiatedByPar)
-      logDiv.append(createdAtPar)
-      logView.append(logDiv)
-    })
+    // extract email from cookie
+    const cookieObject = document.cookie
+      .split(';')
+      .map(cookie => cookie.split('='))
+      .reduce((accumulator, [key, value]) => ({ ...accumulator, [key.trim()]: decodeURIComponent(value) }), {})
+      // filter
+    data.filter(datum => datum.initiatedBy === cookieObject.email)
+      .forEach(element => {
+        const logDiv = document.createElement('div')
+        logDiv.className = 'log-div'
+        const guessPar = document.createElement('p')
+        guessPar.textContent = `Guess: ${element.guess}`
+        const actionPar = document.createElement('p')
+        actionPar.textContent = `Action: ${element.typeOfAction}`
+        const initiatedByPar = document.createElement('p')
+        initiatedByPar.textContent = `Initiated By: ${element.initiatedBy}`
+        const createdAtPar = document.createElement('p')
+        createdAtPar.textContent = `Created at : ${element.timeStamp}`
+        logDiv.append(guessPar)
+        logDiv.append(actionPar)
+        logDiv.append(initiatedByPar)
+        logDiv.append(createdAtPar)
+        logView.append(logDiv)
+      })
   })
 }
 
