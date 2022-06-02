@@ -166,7 +166,7 @@ function revealFeedback (colours, feedbackRow) {
   })
 }
 
-async function checkCurrentRow () {
+function checkCurrentRow () {
   if (currentTile > 4) {
     const currentGuess = boardArray[currentRow].join('').toLowerCase()
 
@@ -180,8 +180,6 @@ async function checkCurrentRow () {
       } else {
         actionType = 'validguess'
         console.log('word is valid')
-        const feedbackRow = currentRow// prevents row from changing before callback called
-        requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
         const options = {
           method: 'POST',
 
@@ -196,12 +194,16 @@ async function checkCurrentRow () {
             console.log(wordOfTheDay)
             if (wordOfTheDay === 'word of the day') {
               feedbackForGuess('Correct')
+              const feedbackRow = currentRow// prevents row from changing before callback called
+              requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
               isGameEnded = true
             } else {
               if (currentRow === 5) {
                 console.log('current row = 5')
 
                 feedbackForGuess('Try again tomorrow')
+                const feedbackRow = currentRow// prevents row from changing before callback called
+                requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
                 fetch('/word/revealWord')
                   .then((response) => response.json())
                   .then((data) => (messageContainer.append('Try again tomorrow :) !!! Today\'s word was: ', data.toUpperCase())))
@@ -212,6 +214,8 @@ async function checkCurrentRow () {
 
               if (currentRow < 5) {
                 feedbackForGuess('Try again')
+                const feedbackRow = currentRow// prevents row from changing before callback called
+                requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
                 currentRow = currentRow + 1
                 currentTile = 0
               }
