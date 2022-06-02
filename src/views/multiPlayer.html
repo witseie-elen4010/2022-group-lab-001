@@ -24,19 +24,19 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h3 class="modal-title">Multiplayer Information:</h3>
+                        <h3 style="color: black;" class="modal-title">Multiplayer Information:</h3>
                     </div>
                     <div class="modal-body">
                         <h3 style="color: black;">There are two options to choose from:</h3>
                         <nr>
-                            <h4> Option 1: Two Player Game - Guessing the word of the day</h4>
+                            <h4 style="color: black;"> Option 1: Two Player Game - Guessing the word of the day</h4>
                             <p style="color:black">One player needs to start the game by clicking on "CREATE 2 Player
                                 Game". This will generate a unique game ID. <br>
                                 This player should then share the game ID with one other person. <br> The second player
                                 must click on "JOIN a Game" and enter the Game ID they
                                 have recieved from the other player <br> Both players must try and guess the word of the
                                 day </p>
-                            <h4> Option 2: Three Player Game -Guessing a word chosen by one of the players</h4>
+                            <h4 style="color: black;"> Option 2: Three Player Game -Guessing a word chosen by one of the players</h4>
                             <p style="color:black">One player needs to start the game by entering a 5-letter word of
                                 their choice and clicking on "CREATE 3 Player Game". This will generate a unique game
                                 ID. <br>
@@ -44,16 +44,16 @@
                                 third player must click on "JOIN a Game" and enter the Game ID they
                                 have recieved from the first player <br> Both players must try and guess the word the
                                 first player has generated </p>
-                            <h4> Once a Multi-player game has began:</h4>
+                            <h4 style="color: black;"> Option 3: Four Player Game - Once a Multi-player game has began:</h4>
                             <p style="color: black;">Each player must guess a 5 letter word and enter it via the
                                 onscreen keyboard or via your physical keyboard.<br>
                                 Click Enter <br>
                                 If the word you entered is valid, you will be given feedback: <br></p> <b>
-                                <p style="color:mediumseagreen" ;> Green: The letter is in the word and in the correct
+                                <p style="color:#538d4e" ;> Green: The letter is in the word and in the correct
                                     position <br> </p>
-                                <p style="color:DodgerBlue"> Blue: The letter is in the word but is in the wrong
+                                <p style="color:#3a4cb5"> Blue: The letter is in the word but is in the wrong
                                     position <br></p>
-                                <p style="color:gray"> Grey: The letter is not in the word <br></p>
+                                <p style="color:#515157"> Grey: The letter is not in the word <br></p>
                             </b>
                             <h4 style="color: orangered;">The first player to correctly guess the word WINS!!!.<br></h4>
                             <p style="color: black;">Each player has 6 chances to guess the correct word
@@ -88,7 +88,7 @@
                 <br>
                 <br>
                 <br>
-                <input id="hostWord" type="text" placeholder = 'Choose a 5-letter Word' />
+                <input id="hostWord" type="text" placeholder = 'Choose a 5-letter Word' style="color:black"; />
                  <button id="btnCreateGame3" class="Button">CREATE 3 Player Game</button>
                  <br>
                  <br>
@@ -118,7 +118,7 @@
         <div style= 'text-align:center' class="joinGameWrapper">
             
             <div class="info">
-                <input id="inputGameId" type="text" placeholder = 'Game ID' />
+                <input id="inputGameId" type="text" placeholder = 'Game ID' style="color: black;" />
             </div>
                 <div id="playerWaitingMessage"> </div>
            
@@ -150,8 +150,30 @@
 
 <div class="gameContainer">
             <div class="title">
-                  <h1>MULTIWORDLE Multi PLAYER</h1>
+                  <h1>MULTIWORDLE MULTI-PLAYER</h1>
             </div>
+            <button type="button" id='logButton' class="btn btn-info btn-lg pull-left" data-toggle="modal" data-target="#Logs" style="position:relative; right:400px; bottom:60px;">View
+            logs
+        </button>
+        <div class="modal fade" id="Logs" role="dialog">
+            <div class="modal-dialog">
+        
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 style="color:black" class="modal-title">Logs:</h4>
+                    </div>
+                    <div style= "color:black;"class="modal-body logs">
+        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+        
+            </div>
+        </div>
             <div class="messageContainer"></div>
             <div class = 'TITLECONTAINERS'>
             <div class="tileContainer1"></div>
