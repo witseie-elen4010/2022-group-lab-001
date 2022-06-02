@@ -4,8 +4,6 @@ const Joi = require('joi')
 const bcrypt = require('bcrypt')
 const User = require('../models/user')
 
-const users = []
-
 const login = async (req, res) => {
   try {
     // validation
@@ -70,8 +68,8 @@ const signup = async (req, res) => {
       password: hashedPassword
     })
     user.save()
-      .then((result) => {
-        res.send(result)
+      .then(() => {
+        res.status(200).send('Signup successful')
       })
       .catch((err) => {
         console.log(err)
