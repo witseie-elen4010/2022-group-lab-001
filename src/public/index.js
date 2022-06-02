@@ -185,8 +185,6 @@ function revealFeedback(colours, feedbackRow) {
           guess: currentGuess, typeOfAction: 'guess', initiatedBy: 'player', timeStamp: currentDate.toLocaleString()
         })
         console.log('word is valid')
-        const feedbackRow = currentRow// prevents row from changing before callback called
-        requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
         const options = {
           method: 'POST',
 

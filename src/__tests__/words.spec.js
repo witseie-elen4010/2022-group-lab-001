@@ -12,7 +12,8 @@ const router = require('../routes/wordRoutes')
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use('/', router)
-test('the word of the day is train, it should return green,green,green,green,green which corresponds to the class used in css to change its appearance', async () => {
+
+test('the colours are corrent when the word guessed matches the correct word', async () => {
   const wordOfTheDay = wordController.getWordOfTheDay().toUpperCase()
   const splitWord = wordOfTheDay.split('')
   const body = { guessJson: splitWord, chosen: '' }
@@ -21,7 +22,7 @@ test('the word of the day is train, it should return green,green,green,green,gre
   expect(response.body).toStrictEqual(['green-block', 'green-block', 'green-block', 'green-block', 'green-block'])
 })
 
-test('the word of the day is train, it should return green,green,green,grey which corresponds to the class used in css to change its appearance', async () => {
+test('the colours are correct when the first 4 letters in the guessed word matches the correct word but last letter  isnt present in the word at all', async () => {
   const wordOfTheDay = wordController.getWordOfTheDay().toUpperCase()
   const splitWord = wordOfTheDay.split('')
   splitWord[splitWord.length - 1] = 'q'
@@ -31,16 +32,17 @@ test('the word of the day is train, it should return green,green,green,grey whic
   expect(response.body).toStrictEqual(['green-block', 'green-block', 'green-block', 'green-block', 'grey-block'])
 })
 
-test('the word of the day is train, it should return blue,green,green,blue which corresponds to the class used in css to change its appearance', async () => {
+test('the colors are correct when the word guessed contains all the letters in the guessed word but the first and second letter which are swapped', async () => {
+ 
   const wordOfTheDay = wordController.getWordOfTheDay().toUpperCase()
   const splitWord = wordOfTheDay.split('')
-  const temp = splitWord[splitWord.length - 1]
-  splitWord[splitWord.length - 1] = splitWord[0]
+  const temp = splitWord[1]
+  splitWord[1] = splitWord[0]
   splitWord[0] = temp
   const body = { guessJson: splitWord, chosen: '' }
   const response = await request(app).post('/getColours').send(body)
   expect(response.statusCode).toBe(200)
-  expect(response.body).toStrictEqual(['blue-block', 'green-block', 'green-block', 'green-block', 'blue-block'])
+  expect(response.body).toStrictEqual(['blue-block', 'blue-block', 'green-block', 'green-block', 'green-block'])
 })
 
 describe('When making a request to /word', () => {
