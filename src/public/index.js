@@ -172,19 +172,13 @@ async function checkCurrentRow () {
 
     const guess = { guess: currentGuess, chosen: '' }
     wordIsValid(guess).then(isValid => {
-      const currentDate = new Date()
-      const cookieObject = document.cookie
-        .split(';')
-        .map(cookie => cookie.split('='))
-        .reduce((accumulator, [key, value]) => ({ ...accumulator, [key.trim()]: decodeURIComponent(value) }), {})
-
-      logActions({
-        guess: currentGuess, typeOfAction: 'guess', initiatedBy: cookieObject.email, timeStamp: currentDate.toLocaleString()
-      })
+      let actionType = ''
       if (!isValid) {
+        actionType = 'invalidguess'
         feedbackForGuess('Invalid Word')
         // delete letters in the row
       } else {
+        actionType = 'validguess'
         console.log('word is valid')
         const feedbackRow = currentRow// prevents row from changing before callback called
         requestFeedback().then((colours) => revealFeedback(colours, feedbackRow))
@@ -224,6 +218,14 @@ async function checkCurrentRow () {
             }
           })
       }
+      const currentDate = new Date()
+      const cookieObject = document.cookie
+        .split(';')
+        .map(cookie => cookie.split('='))
+        .reduce((accumulator, [key, value]) => ({ ...accumulator, [key.trim()]: decodeURIComponent(value) }), {})
+      logActions({
+        guess: currentGuess, typeOfAction: actionType, initiatedBy: cookieObject.email, timeStamp: currentDate.toLocaleString()
+      })
     })
   }
 }
@@ -274,23 +276,30 @@ function viewLogs () {
     } // Return the response parse as JSON
     else { throw 'Failed to load classlist: response code invalid!' }
   }).then(data => {
-    data.forEach(element => {
-      const logDiv = document.createElement('div')
-      logDiv.className = 'log-div'
-      const guessPar = document.createElement('p')
-      guessPar.textContent = `Guess: ${element.guess}`
-      const actionPar = document.createElement('p')
-      actionPar.textContent = `Action: ${element.typeOfAction}`
-      const initiatedByPar = document.createElement('p')
-      initiatedByPar.textContent = `Initiated By: ${element.initiatedBy}`
-      const createdAtPar = document.createElement('p')
-      createdAtPar.textContent = `Created at : ${element.timeStamp}`
-      logDiv.append(guessPar)
-      logDiv.append(actionPar)
-      logDiv.append(initiatedByPar)
-      logDiv.append(createdAtPar)
-      logView.append(logDiv)
-    })
+    // extract email from cookie
+    const cookieObject = document.cookie
+      .split(';')
+      .map(cookie => cookie.split('='))
+      .reduce((accumulator, [key, value]) => ({ ...accumulator, [key.trim()]: decodeURIComponent(value) }), {})
+      // filter
+    data.filter(datum => datum.initiatedBy === cookieObject.email)
+      .forEach(element => {
+        const logDiv = document.createElement('div')
+        logDiv.className = 'log-div'
+        const guessPar = document.createElement('p')
+        guessPar.textContent = `Guess: ${element.guess}`
+        const actionPar = document.createElement('p')
+        actionPar.textContent = `Action: ${element.typeOfAction}`
+        const initiatedByPar = document.createElement('p')
+        initiatedByPar.textContent = `Initiated By: ${element.initiatedBy}`
+        const createdAtPar = document.createElement('p')
+        createdAtPar.textContent = `Created at : ${element.timeStamp}`
+        logDiv.append(guessPar)
+        logDiv.append(actionPar)
+        logDiv.append(initiatedByPar)
+        logDiv.append(createdAtPar)
+        logView.append(logDiv)
+      })
   })
 }
 
