@@ -453,23 +453,12 @@ const App = {
             if (!isValid) {
               feedbackForGuess('Invalid Word')
             } else {
+
               const currentDate = new Date()
               logActions({
                 guess: currentGuess, typeOfAction: 'guess', initiatedBy: 'player', timeStamp: currentDate.toLocaleString()
               })
 
-              const feedbackRow = currentRow
-              requestFeedback().then((colours) => {
-                revealFeedback(colours, feedbackRow)
-
-                const data = {
-                  myRole: App.myRole,
-                  gameId: App.gameId,
-                  colours,
-                  row: feedbackRow
-                }
-                IO.socket.emit('revealColours', data)// so other players can know aswell
-              })
               const options = {
                 method: 'POST',
 
@@ -490,11 +479,35 @@ const App = {
                       gameId: App.gameId
                     }
                     feedbackForGuess('Correct')
+                    const feedbackRow = currentRow
+                    requestFeedback().then((colours) => {
+                      revealFeedback(colours, feedbackRow)
+      
+                      const data = {
+                        myRole: App.myRole,
+                        gameId: App.gameId,
+                        colours,
+                        row: feedbackRow
+                      }
+                      IO.socket.emit('revealColours', data)// so other players can know aswell
+                    })
                     isGameEnded = true
                     IO.socket.emit('gameWinner', data)
                   } else {
                     if (currentRow === 5) {
                       feedbackForGuess('Try again tomorrow')
+                      const feedbackRow = currentRow// ensures it wont change before callbacl complete
+              requestFeedback().then((colours) => {
+                revealFeedback(colours, feedbackRow)
+
+                const data = {
+                  myRole: App.myRole,
+                  gameId: App.gameId,
+                  colours,
+                  row: feedbackRow
+                }
+                IO.socket.emit('revealColours', data)// so other players can know aswell
+              })
                       if (chosenWord.length === 0) {
                         fetch('/word/revealWord')
                           .then((response) => response.json())
@@ -508,6 +521,18 @@ const App = {
 
                     if (currentRow < 5) {
                       feedbackForGuess('Try again')
+                      const feedbackRow = currentRow
+                      requestFeedback().then((colours) => {
+                        revealFeedback(colours, feedbackRow)
+        
+                        const data = {
+                          myRole: App.myRole,
+                          gameId: App.gameId,
+                          colours,
+                          row: feedbackRow
+                        }
+                        IO.socket.emit('revealColours', data)// so other players can know aswell
+                      })
                       currentRow = currentRow + 1
                       currentTile = 0
                     }
@@ -859,21 +884,10 @@ const App = {
               feedbackForGuess('Invalid Word')
               // delete letters in the row
             } else {
+
               const currentDate = new Date()
               logActions({
                 guess: currentGuess, typeOfAction: 'guess', initiatedBy: 'player', timeStamp: currentDate.toLocaleString()
-              })
-              const feedbackRow = currentRow// ensures it wont change before callbacl complete
-              requestFeedback().then((colours) => {
-                revealFeedback(colours, feedbackRow)
-
-                const data = {
-                  myRole: App.myRole,
-                  gameId: App.gameId,
-                  colours,
-                  row: feedbackRow
-                }
-                IO.socket.emit('revealColours', data)// so other players can know aswell
               })
 
               const options = {
@@ -896,10 +910,35 @@ const App = {
                     }
                     IO.socket.emit('gameWinner', data)
                     feedbackForGuess('Correct')
+                    const feedbackRow = currentRow// ensures it wont change before callbacl complete
+                    requestFeedback().then((colours) => {
+                      revealFeedback(colours, feedbackRow)
+      
+                      const data = {
+                        myRole: App.myRole,
+                        gameId: App.gameId,
+                        colours,
+                        row: feedbackRow
+                      }
+                      IO.socket.emit('revealColours', data)// so other players can know aswell
+                    })
                     isGameEnded = true
                   } else {
                     if (currentRow === 5) {
                       feedbackForGuess('Try again tomorrow')
+                      const feedbackRow = currentRow// ensures it wont change before callbacl complete
+                      requestFeedback().then((colours) => {
+                        revealFeedback(colours, feedbackRow)
+        
+                        const data = {
+                          myRole: App.myRole,
+                          gameId: App.gameId,
+                          colours,
+                          row: feedbackRow
+                        }
+                        IO.socket.emit('revealColours', data)// so other players can know aswell
+                      })
+
                       fetch('/word/revealWord')
                         .then((response) => response.json())
                         .then((data) => (messageContainer.append('The correct answer is: ', data.toUpperCase(), '. ')))
@@ -908,6 +947,18 @@ const App = {
                     }
                     if (currentRow < 5) {
                       feedbackForGuess('Try again')
+                      const feedbackRow = currentRow// ensures it wont change before callbacl complete
+              requestFeedback().then((colours) => {
+                revealFeedback(colours, feedbackRow)
+
+                const data = {
+                  myRole: App.myRole,
+                  gameId: App.gameId,
+                  colours,
+                  row: feedbackRow
+                }
+                IO.socket.emit('revealColours', data)// so other players can know aswell
+              })
                       currentRow = currentRow + 1
                       currentTile = 0
                     }
@@ -942,8 +993,8 @@ const App = {
         })
       }
 
-      function activatePhysicalKeyBoard() {
-        document.addEventListener('keydown', (event) => {
+      function activatePhysicalKeyBoard () {
+        document.addEventListener('keyup', (event) => {
           const letter = event.key
           if (letter === 'Backspace' || letter === 'Enter') { handleClick(letter) } else if (letter.length === 1) { handleClick(letter.toUpperCase()) }
         })
