@@ -4,7 +4,8 @@ const dictionary = require('../models/dictionary')
 const validWords = dictionary.getDictionary()
 
 const assignColours = (request, response) => {
-  // const wordOfTheDay = 'train'// needs to be obtained
+  
+  //let wordOfTheDay='CHOSE' this is used in testing
   let wordOfTheDay = getWordOfTheDay().toUpperCase()
 
   const guessedWord = request.body.guessJson
@@ -18,18 +19,18 @@ const assignColours = (request, response) => {
   guessedWord.forEach((letter, index) => { // first assign them all grey
     colours[index] = 'grey-block'
   })
- guessedWord.forEach((letter, index) => {
-    if (checkWordle.includes(letter)) {
-      colours[index] = 'blue-block'
-    }
-  })
   guessedWord.forEach((letter, index) => {
     if (letter === wordOfTheDay[index]) {
       colours[index] = 'green-block'
       checkWordle = checkWordle.replace(letter, '')// ensures we dont undo our work by removing it now its been dealth with
     }
   })
-
+guessedWord.forEach((letter, index) => {
+    if (checkWordle.includes(letter) && colours[index]!='green-block') {
+      colours[index] = 'blue-block'
+      checkWordle = checkWordle.replace(letter, '')// ensures we dont undo our work by removing it now its been dealth with
+    }
+  })
  
 
   response.json(colours)
