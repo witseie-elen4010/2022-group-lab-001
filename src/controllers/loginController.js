@@ -2,6 +2,7 @@
 
 const Joi = require('joi')
 const bcrypt = require('bcrypt')
+const User = require('../models/user')
 
 // TODO: add passport (next sprint)
 // const passport = require('passport')
@@ -29,21 +30,27 @@ const login = async (req, res) => {
       return false
     }
 
-    const login = users.find(lgn => lgn.email === req.body.email)
-    if (!login) {
-      res.status(403).send('Invalid username or password')
-      return false
-    }
-
-    // validate password
-    if (!await bcrypt.compare(req.body.password, login.password)) {
-      res.status(403).send('Invalid username or password')
-      return false
-    }
-
-    // happy case
-    res.status(200).send('Login successful')
-    return true
+    User.findOne({
+      email: req.body.email
+    })
+      .exec((err, user) => {
+        if (err) {
+          res.status(500).send(err)
+          return false
+        }
+        if (!user) {
+          res.status(403).send('Invalid username or password')
+          return false
+        }
+        // validate password
+        if (!bcrypt.compareSync(req.body.password, user.password)) {
+          res.status(403).send('Invalid username or password')
+          return false
+        }
+        // happy case
+        res.status(200).send('Login successful')
+        return true
+      })
   } catch {
     res.redirect('/login')
   }
@@ -66,31 +73,32 @@ const signup = async (req, res) => {
     return
   }
 
-  // check email not already used
-  const existingUser = users?.find(user => user.email === req.body.email)
-  if (existingUser) {
-    res.status(409).send('Email already used')
-    return
-  }
-
-  // happy case
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10)
-    users.push({
-      id: Date.now.toString(),
+    // users.push({
+    //   id: Date.now.toString(),
+    //   email: req.body.email,
+    //   password: hashedPassword
+    // })
+    const user = new User({
       email: req.body.email,
       password: hashedPassword
     })
-    console.log(users)
-    res.status(200).send('Account created successfully')
+    user.save()
+      .then((result) => {
+        res.send(result)
+      })
+      .catch((err) => {
+        console.log(err)
+        if (err.code === 11000) {
+          // Duplicate email
+          res.status(409).send('A user with that email already exists!')
+        }
+      })
   } catch {
     res.status(500).send('Something went wrong')
   }
 }
 
-const getUsers = () => users
-
 module.exports.login = login
 module.exports.signup = signup
-// temporary export for unit testing. To be removed when persistant storage is used
-module.exports.getUsers = getUsers

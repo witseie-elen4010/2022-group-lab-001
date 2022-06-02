@@ -2,15 +2,14 @@
 
 const express = require('express')
 const app = express() // client asks server for a file (by URL)
+const database = require('./database')
 const serv = require('http').createServer(app)
 const mWordle = require('./mWordle')
 const bodyParser = require('body-parser')
 const mainRouter = require('./mainRoutes.js')
 const gameRouter = require('./gameRoutes.js')
 const loginController = require('./routes/loginRoutes')
-
 const wordRouter = require('./routes/wordRoutes')
-
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -32,6 +31,7 @@ io.sockets.on('connection', (socket) => {
   mWordle.initGame(io, socket)
 })
 
+database.connectToDataBase()
 const port = process.env.PORT || 3000
 module.exports = io
 serv.listen(port)
