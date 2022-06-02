@@ -2,6 +2,8 @@
 
 let io
 let wordleSocket
+let numPlayers = 0
+let player3 = false
 
 exports.initGame = function (IO, socket) {
   wordleSocket = socket
@@ -17,9 +19,12 @@ exports.initGame = function (IO, socket) {
   // player events
   wordleSocket.on('playerJoinGame', playerJoinGame)
   wordleSocket.on('gameWinner', letOthersKnowWinner)
+  wordleSocket.on('revealColours', letOthersKnowColours)
 }
 
-function hostCreateNewGame () {
+function hostCreateNewGame() {
+  numPlayers = 0
+  player3 = false
   // Create a unique Socket.IO Room
   const GameId = (Math.random() * 100000) | 0
   // Return Room ID (gameId) and the socket ID (mySocketId) to the browser client
@@ -27,7 +32,7 @@ function hostCreateNewGame () {
   this.join(GameId)
 };
 
-function setupGame (gameId) {
+function setupGame(gameId) {
   const sock = this
   const data = {
     mySocketId: sock.id,
@@ -36,9 +41,8 @@ function setupGame (gameId) {
   io.sockets.in(data.gameId).emit('beginGame', data)
 }
 
-function setupGame3 (data1) {
+function setupGame3(data1) {
   console.log('in HostFull3.')
-
   const sock = data1
   const data = {
     mySocketId: sock.gameId,
@@ -48,24 +52,25 @@ function setupGame3 (data1) {
   io.sockets.in(data.gameId).emit('beginGame3', data)
 }
 
-function startGame (gameId) {
+function startGame(gameId) {
   console.log('Game Started.')
 };
 
-function playerJoinGame (data) {
-  // console.log('Player ' + data.playerName + ' is attempting to join game: ' + data.gameId)
-
+function playerJoinGame(data) {
+  numPlayers += 1
+  player3 = true
   const sock = this
-
+  data.nplayers = numPlayers
+  data.players3 = player3
   const room = wordleSocket.adapter.rooms.has(data.gameId)
   // If the room existsmn
   console.log('Room=' + room)
   if (wordleSocket.adapter.rooms.has(data.gameId)) {
     // attach the socket id to the data object.
     data.mySocketId = sock.id
-    wordleSocket.join(data.gameId)
+    sock.join(data.gameId)
 
-    // console.log('Player ' + data.playerName + ' joining game: ' + data.gameId)
+
 
     io.sockets.in(data.gameId).emit('playerJoinedRoom', data)
   } else {
@@ -73,9 +78,16 @@ function playerJoinGame (data) {
   }
 }
 
-function letOthersKnowWinner (data) {
+function letOthersKnowWinner(data) {
   // tell clients if someone won
   console.log('Winner is' + data.myRole)
   io.sockets.in(data.gameId).emit('winner', data)
-  // this.emit('winner', data)
+
+}
+
+function letOthersKnowColours(data) {
+  // tell all clients progress of most recent players turn
+  console.log('colours revealed from ' + data.myRole + 's last Turn')
+  io.sockets.in(data.gameId).emit('revealColours', data)
+
 }

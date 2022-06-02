@@ -5,8 +5,10 @@
 
     <meta charset="UTF-8" />
     <title>MULTIWORDLE</title>
-    <link rel="stylesheet" href="/cdn/style.css" />
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/cdn/style.css">
 
 </head>
 
@@ -14,18 +16,82 @@
 
 
 <body>
+    <div class="container">
+        <!-- Trigger the modal with a button -->
+        <button type="button" class="btn btn-info btn-lg pull-left" data-toggle="modal" data-target="#Logs"
+            onclick="viewLogs()">View logs
+        </button>
 
-    <div class="gameContainer">
-        <div class="title">
-            <h1>MULTIWORDLE SINGLE PLAYER</h1>
-            <h3>You have 6 opportunities to guess the correct 5-letter word. Good luck!</h3>
+        <!-- Modal -->
+        <div class="modal fade" id="Logs" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Logs:</h4>
+                    </div>
+                    <div class="modal-body logs">
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
         </div>
 
-        <div class="messageContainer"></div>
-        <div class="tileContainer"></div>
-        <div class="keyContainer"></div>
+        <!-- Trigger the modal with a button -->
+        <button type="button" class="btn btn-info btn-lg pull-right" data-toggle="modal"
+            data-target="#Instruction">Instructions </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="Instruction" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">How To Play:</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p style="color: black;">Guess a 5 letter word and enter it via the onscreen keyboard or via
+                            your physical keyboard.<br>
+                            Click Enter <br>
+                            If the word you entered is valid, you will be given feedback: <br></p> <b>
+                            <p style="color:mediumseagreen" ;> Green: The letter is in the word of the day and in
+                                the correct position <br> </p>
+                            <p style="color:DodgerBlue"> Blue: The letter is in the word of the day but is in the
+                                wrong position <br></p>
+                            <p style="color:gray"> Grey: The letter is not in the word of the day <br></p>
+                        </b>
+                        <p style="color:black;">You have 6 opportunities to guess the correct 5-letter word. Good
+                            luck!</p>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="gameContainer">
+            <div class="title">
+                <h1>MULTIWORDLE SINGLE PLAYER</h1>
+            </div>
+
+            <div class="messageContainer"></div>
+            <div class="tileContainer"></div>
+            <div class="keyContainer"></div>
+        </div>
+        <script src="/cdn/index.js"></script>
     </div>
-    <script src="/cdn/index.js"></script>
 </body>
 
 </html>
