@@ -4,16 +4,16 @@ const Schema = mongoose.Schema
 const actionSchema = new Schema({
     guess: {
         type: String,
-        required: false
+        required: [true, 'The guess field is missing']
     },
     typeOfAction: {
         type: String,
-        required: true
+        required: [true, 'The typeOfAction field is missing']
 
     },
     initiatedBy: {
         type: String,
-        required: true
+        required: [true, 'The initiatedBy field is missing']
     }
 }, { timestamps: true })
 
