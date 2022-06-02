@@ -4,18 +4,7 @@ const Joi = require('joi')
 const bcrypt = require('bcrypt')
 const User = require('../models/user')
 
-// TODO: add passport (next sprint)
-// const passport = require('passport')
-// const initialisePassport = require('./passport-config')
-// const flash = require('express-flash')
-// const session = require('express-session')
-
 const users = []
-
-// initialisePassport(
-//   passport,
-//   email => logins.find(user => user.email === email)
-// )
 
 const login = async (req, res) => {
   try {
@@ -39,6 +28,7 @@ const login = async (req, res) => {
           return false
         }
         if (!user) {
+          // no user with that email found
           res.status(403).send('Invalid username or password')
           return false
         }
@@ -75,11 +65,6 @@ const signup = async (req, res) => {
 
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10)
-    // users.push({
-    //   id: Date.now.toString(),
-    //   email: req.body.email,
-    //   password: hashedPassword
-    // })
     const user = new User({
       email: req.body.email,
       password: hashedPassword
